@@ -24,6 +24,10 @@ const nextConfig: NextConfig = {
           protocol: url.protocol.replace(':', '') as 'http' | 'https',
         }
       }),
+      {
+        hostname: '**.manus.computer',
+        protocol: 'https',
+      },
     ],
   },
   webpack: (webpackConfig) => {
