@@ -8,7 +8,7 @@ const PRODUCTS_IMG =
 
 export const ProductShowcaseBlock: React.FC<ProductShowcaseBlockType> = ({
   sectionTitle,
-  description,
+  sectionSubtitle,
   products,
 }) => {
   let imgUrl = PRODUCTS_IMG
@@ -39,7 +39,7 @@ export const ProductShowcaseBlock: React.FC<ProductShowcaseBlockType> = ({
                 {sectionTitle || '产品和解决方案'}
               </h2>
               <p className="mt-3 text-sm text-gray-500 leading-relaxed max-w-md">
-                {description ||
+                {sectionSubtitle ||
                   '基于自主研发的智能纤维传感技术，为工业、医疗、汽车等领域提供全方位的解决方案。'}
               </p>
               <Link

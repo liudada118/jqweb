@@ -1,0 +1,12 @@
+
+> guiqiao-payload@1.0.0 dev C:\Users\10530\Documents\GitHub\jqweb
+> cross-env NODE_OPTIONS=--no-deprecation next dev
+
+▲ Next.js 16.2.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://10.100.10.170:3000
+- Environments: .env
+✓ Ready in 552ms
+Creating turbopack project { dir: 'C:\\Users\\10530\\Documents\\GitHub\\jqweb', testMode: true }
+
+ ELIFECYCLE  Command failed with exit code 3221225786.

@@ -159,7 +159,7 @@ async function seed() {
     try {
       await payload.create({
         collection: 'posts',
-        data: post,
+        data: post as any,
       })
       console.log(`✅ Post: ${post.title}`)
     } catch (e: any) {
@@ -311,13 +311,13 @@ async function seed() {
       await payload.update({
         collection: 'pages',
         id: existingHome.docs[0].id,
-        data: homeData,
+        data: homeData as any,
       })
       console.log('✅ Homepage updated')
     } else {
       await payload.create({
         collection: 'pages',
-        data: homeData,
+        data: homeData as any,
       })
       console.log('✅ Homepage created')
     }
