@@ -17,7 +17,8 @@ export async function GET(req: NextRequest): Promise<Response> {
   const slug = searchParams.get('slug')
   const previewSecret = searchParams.get('previewSecret')
 
-  if (previewSecret !== process.env.PREVIEW_SECRET) {
+  // Only check preview secret if it's configured
+  if (process.env.PREVIEW_SECRET && previewSecret !== process.env.PREVIEW_SECRET) {
     return new Response('You are not allowed to preview this page', { status: 403 })
   }
 
