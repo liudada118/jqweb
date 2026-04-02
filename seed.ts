@@ -34,21 +34,29 @@ async function seed() {
   }
 
   // Create categories
-  const categoryTitles = ['公司新闻', '行业动态', '产品发布', '技术文章']
+  const categoryEntries = [
+    { title: '公司新闻', slug: 'company-news' },
+    { title: '行业动态', slug: 'industry-updates' },
+    { title: '产品发布', slug: 'product-releases' },
+    { title: '技术文章', slug: 'technical-articles' },
+  ]
   const categoryIds: Record<string, number> = {}
-  for (const title of categoryTitles) {
+  for (const category of categoryEntries) {
     try {
       const cat = await payload.create({
         collection: 'categories',
         data: {
-          title,
-          slug: slugify(title),
+          title: category.title,
+          slug: category.slug,
+        },
+        context: {
+          disableRevalidate: true,
         },
       })
-      categoryIds[title] = cat.id
-      console.log(`✅ Category: ${title}`)
+      categoryIds[category.title] = cat.id
+      console.log(`✅ Category: ${category.title}`)
     } catch (e: any) {
-      console.log(`ℹ️ Category ${title}: ${e.message}`)
+      console.log(`ℹ️ Category ${category.title}: ${e.message}`)
     }
   }
 
@@ -160,6 +168,9 @@ async function seed() {
       await payload.create({
         collection: 'posts',
         data: post as any,
+        context: {
+          disableRevalidate: true,
+        },
       })
       console.log(`✅ Post: ${post.title}`)
     } catch (e: any) {
@@ -312,18 +323,196 @@ async function seed() {
         collection: 'pages',
         id: existingHome.docs[0].id,
         data: homeData as any,
+        context: {
+          disableRevalidate: true,
+        },
       })
       console.log('✅ Homepage updated')
     } else {
       await payload.create({
         collection: 'pages',
         data: homeData as any,
+        context: {
+          disableRevalidate: true,
+        },
       })
       console.log('✅ Homepage created')
     }
   } catch (e: any) {
     console.error('❌ Error creating homepage:', e.message)
     if (e.data) console.error('Details:', JSON.stringify(e.data, null, 2))
+  }
+
+  const supplementalPages = [
+    {
+      title: '关于我们',
+      slug: 'about',
+      _status: 'published' as const,
+      hero: {
+        type: 'none' as const,
+      },
+      layout: [
+        {
+          blockType: 'richContent' as const,
+          sectionTitle: '关于柜侨工业',
+          content: makeRichText(
+            '柜侨工业专注于精密工业设备、光纤传感与智能监测解决方案，为制造、桥梁、电力与工业自动化场景提供稳定可靠的产品与服务。',
+          ),
+          layout: 'fullWidth' as const,
+          backgroundColor: 'none' as const,
+        },
+      ],
+    },
+    {
+      title: '品牌故事',
+      slug: 'brand-story',
+      _status: 'published' as const,
+      hero: {
+        type: 'none' as const,
+      },
+      layout: [
+        {
+          blockType: 'richContent' as const,
+          sectionTitle: '品牌故事',
+          content: makeRichText(
+            '从精密制造到智能感知，柜侨工业持续投入研发与工程化能力建设，围绕真实工业场景打磨产品，形成了从传感器到系统方案的完整能力。',
+          ),
+          layout: 'fullWidth' as const,
+          backgroundColor: 'gray' as const,
+        },
+      ],
+    },
+    {
+      title: '产品中心',
+      slug: 'products',
+      _status: 'published' as const,
+      hero: {
+        type: 'none' as const,
+      },
+      layout: [
+        {
+          blockType: 'richContent' as const,
+          sectionTitle: '产品中心',
+          content: makeRichText(
+            '这里展示柜侨工业的核心产品方向，包括光纤传感器、智能监测系统与行业级解决方案。',
+          ),
+          layout: 'fullWidth' as const,
+          backgroundColor: 'none' as const,
+        },
+      ],
+    },
+    {
+      title: '关怀事业部',
+      slug: 'care',
+      _status: 'published' as const,
+      hero: {
+        type: 'none' as const,
+      },
+      layout: [
+        {
+          blockType: 'richContent' as const,
+          sectionTitle: '关怀事业部',
+          content: makeRichText(
+            '关怀事业部聚焦贴近用户体验、柔性感知和智能应用相关场景，强调稳定、舒适与长期可用性。',
+          ),
+          layout: 'fullWidth' as const,
+          backgroundColor: 'none' as const,
+        },
+      ],
+    },
+    {
+      title: '精密事业部',
+      slug: 'precision',
+      _status: 'published' as const,
+      hero: {
+        type: 'none' as const,
+      },
+      layout: [
+        {
+          blockType: 'richContent' as const,
+          sectionTitle: '精密事业部',
+          content: makeRichText(
+            '精密事业部面向高精度检测与复杂结构监测场景，提供更强调精度、耐用性和环境适应性的产品与方案。',
+          ),
+          layout: 'fullWidth' as const,
+          backgroundColor: 'gray' as const,
+        },
+      ],
+    },
+    {
+      title: '定制解决方案',
+      slug: 'customsolutions',
+      _status: 'published' as const,
+      hero: {
+        type: 'none' as const,
+      },
+      layout: [
+        {
+          blockType: 'richContent' as const,
+          sectionTitle: '定制解决方案',
+          content: makeRichText(
+            '针对非标准化项目，柜侨工业支持按场景定制传感器、结构件、监测逻辑与数据呈现方式。',
+          ),
+          layout: 'fullWidth' as const,
+          backgroundColor: 'none' as const,
+        },
+      ],
+    },
+    {
+      title: '联系我们',
+      slug: 'contact',
+      _status: 'published' as const,
+      hero: {
+        type: 'none' as const,
+      },
+      layout: [
+        {
+          blockType: 'contactInfo' as const,
+          sectionTitle: '联系我们',
+          companyName: '柜侨工业科技有限公司',
+          address: '中国广东省深圳市南山区科技园\n高新南一道88号\n柜侨工业大厦',
+          phone: '+86-755-8888-6666',
+          email: 'info@guiqiao.com',
+          fax: '+86-755-8888-6667',
+        },
+      ],
+    },
+  ]
+
+  for (const page of supplementalPages) {
+    try {
+      const existingPage = await payload.find({
+        collection: 'pages',
+        limit: 1,
+        pagination: false,
+        where: {
+          slug: { equals: page.slug },
+        },
+      })
+
+      if (existingPage.docs.length > 0) {
+        await payload.update({
+          collection: 'pages',
+          id: existingPage.docs[0].id,
+          data: page as any,
+          context: {
+            disableRevalidate: true,
+          },
+        })
+        console.log(`✅ Page updated: ${page.slug}`)
+      } else {
+        await payload.create({
+          collection: 'pages',
+          data: page as any,
+          context: {
+            disableRevalidate: true,
+          },
+        })
+        console.log(`✅ Page created: ${page.slug}`)
+      }
+    } catch (e: any) {
+      console.log(`ℹ️ Page ${page.slug}: ${e.message}`)
+    }
   }
 
   console.log('🎉 Seed complete!')

@@ -8,70 +8,74 @@ import { ThemeSelector } from '@/providers/Theme/ThemeSelector'
 import { BackToTopButton } from './BackToTop'
 import { ContactAnimation } from './ContactAnimation'
 
+const contactLinks = [
+  { label: '问答', href: '/about' },
+  { label: '联系', href: '/contact' },
+  { label: '加入我们', href: '/contact' },
+]
+
 export async function Footer() {
   const footerData: Footer = await getCachedGlobal('footer', 1)()
+  void footerData
 
   return (
     <>
-      {/* Contact Section */}
-      <section className="py-12 lg:py-20 bg-white">
+      <section className="bg-white py-12 lg:py-20">
         <div className="container">
           <ContactAnimation type="heading">
-            <h2 className="text-xl lg:text-2xl font-bold text-center text-gray-900 mb-8 lg:mb-12">
+            <h2 className="mb-8 text-center text-xl font-bold text-gray-900 lg:mb-12 lg:text-2xl">
               请联系我们
             </h2>
           </ContactAnimation>
           <ContactAnimation type="content">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6 max-w-3xl mx-auto">
-              {['问答', '联系', '加入我们'].map((label, index) => (
-                <a
-                  key={index}
-                  href="#"
-                  className="h-12 lg:h-14 text-sm lg:text-base font-medium rounded-sm flex items-center justify-center hover:opacity-90 transition-opacity" style={{ backgroundColor: 'oklch(0.45 0.2 264)', color: '#ffffff' }}
+            <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3 lg:gap-6">
+              {contactLinks.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="flex h-12 items-center justify-center rounded-sm text-sm font-medium text-white transition-opacity hover:opacity-90 lg:h-14 lg:text-base"
+                  style={{ backgroundColor: 'oklch(0.45 0.2 264)' }}
                 >
-                  {label}
-                </a>
+                  {item.label}
+                </Link>
               ))}
             </div>
           </ContactAnimation>
         </div>
       </section>
 
-      {/* Back to Top */}
-      <div className="py-4 bg-white">
+      <div className="bg-white py-4">
         <div className="container flex justify-end">
           <BackToTopButton />
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-10 lg:py-14">
+      <footer className="bg-gray-900 py-10 text-gray-300 lg:py-14">
         <div className="container">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 lg:gap-16 max-w-2xl">
-            {/* Solutions Column */}
+          <div className="grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-2 lg:gap-16">
             <div>
-              <h3 className="text-sm font-bold text-white mb-4">解决方案</h3>
+              <h3 className="mb-4 text-sm font-bold text-white">解决方案</h3>
               <ul className="space-y-2.5">
                 <li>
                   <Link
-                    href="/custom/solutions"
-                    className="text-xs text-gray-400 hover:text-white transition-colors"
+                    href="/customsolutions"
+                    className="text-xs text-gray-400 transition-colors hover:text-white"
                   >
                     柔性拉高压力传感
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/care/solutions"
-                    className="text-xs text-gray-400 hover:text-white transition-colors"
+                    href="/care"
+                    className="text-xs text-gray-400 transition-colors hover:text-white"
                   >
                     柔性金属监测系统
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/custom/solutions"
-                    className="text-xs text-gray-400 hover:text-white transition-colors"
+                    href="/precision"
+                    className="text-xs text-gray-400 transition-colors hover:text-white"
                   >
                     汽车座椅智能性分析系统
                   </Link>
@@ -79,22 +83,21 @@ export async function Footer() {
               </ul>
             </div>
 
-            {/* About Column */}
             <div>
-              <h3 className="text-sm font-bold text-white mb-4">关于柜侨工业</h3>
+              <h3 className="mb-4 text-sm font-bold text-white">关于柜侨工业</h3>
               <ul className="space-y-2.5">
                 <li>
                   <Link
-                    href="/brand-story"
-                    className="text-xs text-gray-400 hover:text-white transition-colors"
+                    href="/contact"
+                    className="text-xs text-gray-400 transition-colors hover:text-white"
                   >
                     联系我们
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/brand-story"
-                    className="text-xs text-gray-400 hover:text-white transition-colors"
+                    href="/about"
+                    className="text-xs text-gray-400 transition-colors hover:text-white"
                   >
                     公司简介
                   </Link>
@@ -103,8 +106,7 @@ export async function Footer() {
             </div>
           </div>
 
-          {/* Copyright */}
-          <div className="mt-10 pt-6 border-t border-gray-800">
+          <div className="mt-10 border-t border-gray-800 pt-6">
             <div className="flex items-center justify-between">
               <p className="text-xs text-gray-500">
                 &copy; {new Date().getFullYear()} 柜侨工业. All rights reserved.

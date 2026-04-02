@@ -22,7 +22,7 @@ const defaultNewsItems = [
     image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400&h=300&fit=crop',
     title: '无人机搭载纤维传感系统完成首飞',
     summary: '搭载柜侨纤维传感系统的工业无人机成功完成首次飞行测试。',
-    href: '/custom/solutions',
+    href: '/customsolutions',
   },
   {
     image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop',

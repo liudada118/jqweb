@@ -1,4 +1,5 @@
 'use client'
+
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
@@ -20,11 +21,11 @@ interface NavItem {
 const navItems: NavItem[] = [
   {
     label: '关于我们',
-    href: '/brand-story',
+    href: '/about',
     dropdown: [
       { label: '品牌故事', href: '/brand-story' },
-      { label: '联系我们', href: '#' },
-      { label: '公司资料', href: '#' },
+      { label: '联系我们', href: '/contact' },
+      { label: '公司资料', href: '/about' },
     ],
   },
   {
@@ -44,7 +45,7 @@ const navItems: NavItem[] = [
       { label: '关怀事业部', href: '/care' },
       { label: '精密事业部', href: '/precision' },
       { label: '定制事业部', href: '/customsolutions' },
-      { label: 'Lab实验室', href: '#' },
+      { label: 'Lab实验室', href: '/about' },
     ],
   },
 ]
@@ -66,9 +67,11 @@ function DesktopDropdown({
         onClose()
       }
     }
+
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside)
     }
+
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isOpen, onClose])
 
@@ -77,14 +80,14 @@ function DesktopDropdown({
   return (
     <div
       ref={ref}
-      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-44 rounded-sm shadow-lg border py-1.5 z-50 bg-white border-gray-100"
+      className="absolute top-full left-1/2 z-50 mt-2 w-44 -translate-x-1/2 rounded-sm border border-gray-100 bg-white py-1.5 shadow-lg"
     >
       {items.map((item) => (
         <Link
           key={item.label}
           href={item.href}
           onClick={onClose}
-          className="block px-4 py-2 text-sm transition-colors text-gray-600 hover:text-primary hover:bg-gray-50"
+          className="block px-4 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-primary"
         >
           {item.label}
         </Link>
@@ -97,7 +100,7 @@ interface HeaderClientProps {
   data: Header
 }
 
-export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
+export const HeaderClient: React.FC<HeaderClientProps> = ({ data: _data }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null)
@@ -112,23 +115,21 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-sm border-b transition-colors bg-white/95 border-gray-100">
-      <div className="container flex items-center justify-between h-16 lg:h-[72px]">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center">
-            <span className="text-white text-sm font-bold tracking-tight">GQ</span>
+    <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur-sm transition-colors">
+      <div className="container flex h-16 items-center justify-between lg:h-[72px]">
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+            <span className="text-sm font-bold tracking-tight text-white">GQ</span>
           </div>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-9">
+        <nav className="hidden items-center gap-9 lg:flex">
           {navItems.map((item) => (
             <div key={item.label} className="relative">
               {item.dropdown ? (
                 <button
                   onClick={() => toggleDropdown(item.label)}
-                  className={`flex items-center gap-1 text-sm font-medium transition-colors duration-200 text-gray-700 hover:text-primary ${
+                  className={`flex items-center gap-1 text-sm font-medium text-gray-700 transition-colors duration-200 hover:text-primary ${
                     pathname === item.href || item.dropdown.some((d) => pathname === d.href)
                       ? 'text-primary'
                       : ''
@@ -136,7 +137,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
                 >
                   {item.label}
                   <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    className={`h-3.5 w-3.5 transition-transform duration-200 ${
                       openDropdown === item.label ? 'rotate-180' : ''
                     }`}
                   />
@@ -144,13 +145,14 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
               ) : (
                 <Link
                   href={item.href}
-                  className={`text-sm font-medium transition-colors duration-200 text-gray-700 hover:text-primary ${
+                  className={`text-sm font-medium text-gray-700 transition-colors duration-200 hover:text-primary ${
                     pathname === item.href ? 'text-primary' : ''
                   }`}
                 >
                   {item.label}
                 </Link>
               )}
+
               {item.dropdown && (
                 <DesktopDropdown
                   items={item.dropdown}
@@ -162,26 +164,25 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
           ))}
         </nav>
 
-        {/* Right side utilities */}
         <div className="flex items-center gap-5">
-          <button className="hidden lg:flex items-center gap-1.5 text-sm transition-colors text-gray-600 hover:text-primary">
+          <button className="hidden items-center gap-1.5 text-sm text-gray-600 transition-colors hover:text-primary lg:flex">
             <span>语言</span>
           </button>
-          <button className="transition-colors text-gray-500 hover:text-primary">
-            <Search className="w-[18px] h-[18px]" />
-          </button>
+          <Link href="/search" className="text-gray-500 transition-colors hover:text-primary">
+            <span className="sr-only">Search</span>
+            <Search className="h-[18px] w-[18px]" />
+          </Link>
           <button
-            className="lg:hidden text-gray-600"
+            className="text-gray-600 lg:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t py-4 bg-white border-gray-100">
+        <div className="border-t border-gray-100 bg-white py-4 lg:hidden">
           <nav className="container flex flex-col gap-1">
             {navItems.map((item) => (
               <div key={item.label}>
@@ -189,23 +190,23 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
                   <>
                     <button
                       onClick={() => toggleMobileExpanded(item.label)}
-                      className="flex items-center justify-between w-full text-sm py-2.5 text-gray-700"
+                      className="flex w-full items-center justify-between py-2.5 text-sm text-gray-700"
                     >
                       {item.label}
                       <ChevronDown
-                        className={`w-4 h-4 transition-transform duration-200 ${
+                        className={`h-4 w-4 transition-transform duration-200 ${
                           mobileExpanded === item.label ? 'rotate-180' : ''
                         }`}
                       />
                     </button>
                     {mobileExpanded === item.label && (
-                      <div className="pl-4 pb-2 space-y-1">
+                      <div className="space-y-1 pb-2 pl-4">
                         {item.dropdown.map((sub) => (
                           <Link
                             key={sub.label}
                             href={sub.href}
                             onClick={() => setMobileMenuOpen(false)}
-                            className="block text-sm py-2 text-gray-500 hover:text-primary"
+                            className="block py-2 text-sm text-gray-500 hover:text-primary"
                           >
                             {sub.label}
                           </Link>
@@ -217,15 +218,15 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data }) => {
                   <Link
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block text-sm py-2.5 text-gray-700"
+                    className="block py-2.5 text-sm text-gray-700"
                   >
                     {item.label}
                   </Link>
                 )}
               </div>
             ))}
-            <div className="pt-2 mt-2 border-t border-gray-100">
-              <button className="text-sm py-2 text-gray-600">语言切换</button>
+            <div className="mt-2 border-t border-gray-100 pt-2">
+              <button className="py-2 text-sm text-gray-600">语言切换</button>
             </div>
           </nav>
         </div>

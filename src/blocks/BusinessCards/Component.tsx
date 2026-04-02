@@ -30,7 +30,7 @@ export const BusinessCardsBlock: React.FC<BusinessCardsBlockType> = ({ cards }) 
             title: card.title,
             image: imgUrl,
             labelPosition: defaultCards[i]?.labelPosition || ('bottom-left' as const),
-            href: card.linkUrl || '#',
+            href: card.linkUrl || defaultCards[i]?.href || '/about',
           }
         })
       : defaultCards
