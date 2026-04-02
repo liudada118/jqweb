@@ -1,12 +1,59 @@
 
-> guiqiao-payload@1.0.0 dev C:\Users\10530\Documents\GitHub\jqweb
+> guiqiao-payload@1.0.0 dev /home/ubuntu/guiqiao-y
 > cross-env NODE_OPTIONS=--no-deprecation next dev
 
 ▲ Next.js 16.2.1 (Turbopack)
-- Local:         http://localhost:3000
-- Network:       http://10.100.10.170:3000
+- Local:         http://localhost:3001
+- Network:       http://169.254.0.21:3001
 - Environments: .env
-✓ Ready in 552ms
-Creating turbopack project { dir: 'C:\\Users\\10530\\Documents\\GitHub\\jqweb', testMode: true }
+✓ Ready in 432ms
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
 
- ELIFECYCLE  Command failed with exit code 3221225786.
+
+○ Compiling /[slug] ...
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+[00:35:39] [33mWARN[39m: [36mNo email adapter provided. Email will be written to console. More info at https://payloadcms.com/docs/email/overview.[39m
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+[00:35:42] [33mWARN[39m: [36mNo email adapter provided. Email will be written to console. More info at https://payloadcms.com/docs/email/overview.[39m
+ GET /brand-story 200 in 11.9s (next.js: 8.0s, generate-params: 3.0s, application-code: 3.9s)
+ GET /api/users/me 200 in 3.6s (next.js: 3.6s, application-code: 32ms)
+ GET /api/media/file/brand-story-hero-1.jpg 200 in 4.3s (next.js: 4.2s, application-code: 49ms)
+ GET / 200 in 1551ms (next.js: 972ms, application-code: 580ms)
+ GET /brand-story 200 in 389ms (next.js: 59ms, generate-params: 51ms, application-code: 330ms)
+ GET /api/media/file/brand-story-hero-1.jpg 200 in 82ms (next.js: 66ms, application-code: 16ms)
+ GET /api/users/me 200 in 10ms (next.js: 4ms, application-code: 6ms)
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+[00:36:43] [33mWARN[39m: [36mNo email adapter provided. Email will be written to console. More info at https://payloadcms.com/docs/email/overview.[39m
+ GET /care 200 in 451ms (next.js: 45ms, generate-params: 38ms, application-code: 406ms)
+ GET /api/media/file/pressure-sensor-1.jpg 200 in 102ms (next.js: 60ms, application-code: 42ms)
+ GET /api/media/file/care-hero-1.jpg 200 in 51ms (next.js: 10ms, application-code: 41ms)
+ GET /api/users/me 200 in 18ms (next.js: 4ms, application-code: 15ms)
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+[00:36:56] [33mWARN[39m: [36mNo email adapter provided. Email will be written to console. More info at https://payloadcms.com/docs/email/overview.[39m
+ GET /precision 200 in 449ms (next.js: 53ms, generate-params: 50ms, application-code: 395ms)
+ GET /api/media/file/fbg-sensor-1.jpg 200 in 93ms (next.js: 54ms, application-code: 39ms)
+ GET /api/media/file/precision-hero-1.jpg 200 in 27ms (next.js: 6ms, application-code: 20ms)
+ GET /api/users/me 200 in 16ms (next.js: 4ms, application-code: 12ms)
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+[00:37:27] [33mWARN[39m: [36mNo email adapter provided. Email will be written to console. More info at https://payloadcms.com/docs/email/overview.[39m
+ GET /api/media/file/fbg-sensor-1.jpg 200 in 91ms (next.js: 41ms, application-code: 50ms)
+ GET /api/media/file/bridge-1.jpg 200 in 49ms (next.js: 7ms, application-code: 42ms)
+ GET /api/media/file/energy-1.jpg 200 in 32ms (next.js: 5ms, application-code: 27ms)
+ GET /api/media/file/seat-system-1.jpg 200 in 34ms (next.js: 13ms, application-code: 21ms)
+ GET /products 200 in 690ms (next.js: 42ms, generate-params: 39ms, application-code: 648ms)
+ GET /api/media/file/rehab-1.jpg 200 in 39ms (next.js: 8ms, application-code: 30ms)
+ GET /api/media/file/products-hero-1.jpg 200 in 19ms (next.js: 2ms, application-code: 17ms)
+ GET /api/users/me 200 in 9ms (next.js: 3ms, application-code: 5ms)
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+[00:37:38] [33mWARN[39m: [36mNo email adapter provided. Email will be written to console. More info at https://payloadcms.com/docs/email/overview.[39m
+ GET / 200 in 339ms (next.js: 4ms, application-code: 335ms)
+ GET /api/users/me 200 in 52ms (next.js: 45ms, application-code: 8ms)

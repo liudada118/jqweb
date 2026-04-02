@@ -26,9 +26,8 @@ export const generateMeta = async (args: {
 
   const ogImage = getImageURL(doc?.meta?.image)
 
-  const title = doc?.meta?.title
-    ? doc?.meta?.title + ' | 柜侨工业'
-    : '柜侨工业'
+  // Layout template already appends ' | 柜侨工业', so just return the page title
+  const title = doc?.meta?.title || doc?.title || '柜侨工业'
 
   return {
     description: doc?.meta?.description,

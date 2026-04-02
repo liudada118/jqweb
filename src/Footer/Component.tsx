@@ -9,9 +9,9 @@ import { BackToTopButton } from './BackToTop'
 import { ContactAnimation } from './ContactAnimation'
 
 const contactLinks = [
-  { label: '问答', href: '/about' },
-  { label: '联系', href: '/contact' },
-  { label: '加入我们', href: '/contact' },
+  { label: '问答', href: '/products' },
+  { label: '联系', href: '/brand-story' },
+  { label: '加入我们', href: '/brand-story' },
 ]
 
 export async function Footer() {
@@ -52,24 +52,17 @@ export async function Footer() {
 
       <footer className="bg-gray-900 py-10 text-gray-300 lg:py-14">
         <div className="container">
-          <div className="grid max-w-2xl grid-cols-1 gap-8 sm:grid-cols-2 lg:gap-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            {/* Solutions Column */}
             <div>
               <h3 className="mb-4 text-sm font-bold text-white">解决方案</h3>
               <ul className="space-y-2.5">
                 <li>
                   <Link
-                    href="/customsolutions"
-                    className="text-xs text-gray-400 transition-colors hover:text-white"
-                  >
-                    柔性拉高压力传感
-                  </Link>
-                </li>
-                <li>
-                  <Link
                     href="/care"
                     className="text-xs text-gray-400 transition-colors hover:text-white"
                   >
-                    柔性金属监测系统
+                    柔性压力传感
                   </Link>
                 </li>
                 <li>
@@ -77,30 +70,94 @@ export async function Footer() {
                     href="/precision"
                     className="text-xs text-gray-400 transition-colors hover:text-white"
                   >
-                    汽车座椅智能性分析系统
+                    精密光纤监测系统
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/customsolutions"
+                    className="text-xs text-gray-400 transition-colors hover:text-white"
+                  >
+                    定制化传感方案
                   </Link>
                 </li>
               </ul>
             </div>
 
+            {/* Products Column */}
+            <div>
+              <h3 className="text-sm font-bold text-white mb-4">产品中心</h3>
+              <ul className="space-y-2.5">
+                <li>
+                  <Link
+                    href="/products"
+                    className="text-xs text-gray-400 hover:text-white transition-colors"
+                  >
+                    产品与解决方案
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/products"
+                    className="text-xs text-gray-400 hover:text-white transition-colors"
+                  >
+                    CU7+ 光纤传感器
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/products"
+                    className="text-xs text-gray-400 hover:text-white transition-colors"
+                  >
+                    ICU11 智能监测平台
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* About Column */}
             <div>
               <h3 className="mb-4 text-sm font-bold text-white">关于柜侨工业</h3>
               <ul className="space-y-2.5">
                 <li>
                   <Link
-                    href="/contact"
+                    href="/brand-story"
                     className="text-xs text-gray-400 transition-colors hover:text-white"
                   >
-                    联系我们
+                    品牌故事
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/about"
+                    href="/brand-story"
                     className="text-xs text-gray-400 transition-colors hover:text-white"
                   >
                     公司简介
                   </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/posts"
+                    className="text-xs text-gray-400 hover:text-white transition-colors"
+                  >
+                    新闻资讯
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Contact Column */}
+            <div>
+              <h3 className="text-sm font-bold text-white mb-4">联系我们</h3>
+              <ul className="space-y-2.5">
+                <li className="text-xs text-gray-400">
+                  电话: +86-755-8888-6666
+                </li>
+                <li className="text-xs text-gray-400">
+                  邮箱: info@guiqiao.com
+                </li>
+                <li className="text-xs text-gray-400">
+                  地址: 中国广东省深圳市南山区
                 </li>
               </ul>
             </div>

@@ -21,3 +21,5 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 *.db
+dev-server.err.log
+dev-server.out.log
