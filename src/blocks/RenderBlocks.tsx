@@ -61,7 +61,12 @@ export const RenderBlocks: React.FC<{
 
             if (Block) {
               return (
-                <div key={index}>
+                <div
+                  key={index}
+                  data-block-id={block.id || `block-${index}`}
+                  data-block-type={blockType}
+                  data-block-index={index}
+                >
                   {/* @ts-expect-error there may be some mismatch between the expected types here */}
                   <Block {...block} disableInnerContainer />
                 </div>
