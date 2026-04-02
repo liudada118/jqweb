@@ -1,5 +1,4 @@
 import type { AdminViewServerProps } from 'payload'
-import { DefaultTemplate } from '@payloadcms/next/templates'
 import React from 'react'
 import { VisualEditorClient } from './VisualEditorClient'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -15,29 +14,16 @@ export function VisualEditorView({
 
   if (!user) {
     return (
-      <DefaultTemplate
-        i18n={initPageResult.req.i18n}
-        locale={initPageResult.locale}
-        params={params}
-        payload={payload}
-        permissions={initPageResult.permissions}
-        searchParams={searchParams}
-        user={undefined}
-        visibleEntities={initPageResult.visibleEntities}
-      >
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-          <h2>请先登录</h2>
-          <p>您需要登录后才能使用可视化编辑器。</p>
-        </div>
-      </DefaultTemplate>
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <h2>请先登录</h2>
+        <p>您需要登录后才能使用可视化编辑器。</p>
+        <a href="/admin" style={{ color: '#3b82f6' }}>返回登录</a>
+      </div>
     )
   }
 
-  // We'll fetch pages client-side via the REST API
-  // Pass the base URL so the client can build iframe URLs
   const baseUrl = getServerSideURL()
 
-  // Get initial pages list from the server
   const pagesPromise = payload.find({
     collection: 'pages',
     limit: 50,
@@ -52,26 +38,16 @@ export function VisualEditorView({
     <VisualEditorWrapper
       pagesPromise={pagesPromise}
       baseUrl={baseUrl}
-      initPageResult={initPageResult}
-      params={params}
-      searchParams={searchParams}
     />
   )
 }
 
-// Async wrapper to resolve the promise
 async function VisualEditorWrapper({
   pagesPromise,
   baseUrl,
-  initPageResult,
-  params,
-  searchParams,
 }: {
   pagesPromise: Promise<any>
   baseUrl: string
-  initPageResult: any
-  params: any
-  searchParams: any
 }) {
   const pagesResult = await pagesPromise
   const pages = pagesResult.docs.map((p: any) => ({
@@ -81,12 +57,10 @@ async function VisualEditorWrapper({
   }))
 
   return (
-    <div style={{ margin: '-20px', marginTop: '-40px' }}>
-      <VisualEditorClient
-        initialPages={pages}
-        initialSlug="home"
-        baseUrl={baseUrl}
-      />
-    </div>
+    <VisualEditorClient
+      initialPages={pages}
+      initialSlug="home"
+      baseUrl={baseUrl}
+    />
   )
 }

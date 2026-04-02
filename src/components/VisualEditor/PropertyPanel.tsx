@@ -9,7 +9,6 @@ interface PropertyPanelProps {
   onUpdateBlock: (blockId: string, updates: Partial<BlockItem>) => void
 }
 
-// Field types that we can detect and render appropriate editors
 type FieldType = 'text' | 'textarea' | 'image' | 'array' | 'select' | 'richtext' | 'unknown'
 
 function detectFieldType(key: string, value: unknown): FieldType {
@@ -26,129 +25,73 @@ function detectFieldType(key: string, value: unknown): FieldType {
 }
 
 const FIELD_LABELS: Record<string, string> = {
-  title: '标题',
-  subtitle: '副标题',
-  description: '描述',
-  backgroundImage: '背景图片',
-  ctaButtons: '行动按钮',
-  items: '列表项',
-  cards: '卡片列表',
-  channels: '渠道列表',
-  products: '产品列表',
-  features: '功能列表',
-  events: '事件列表',
-  images: '图片列表',
-  posts: '文章列表',
-  sectionTitle: '板块标题',
-  sectionSubtitle: '板块副标题',
-  value: '数值',
-  unit: '单位',
-  label: '标签',
-  icon: '图标',
-  name: '名称',
-  platform: '平台',
-  url: '链接',
-  linkUrl: '链接地址',
-  link: '链接',
-  year: '年份',
-  caption: '说明',
-  content: '内容',
-  variant: '样式',
+  title: '标题', subtitle: '副标题', description: '描述', backgroundImage: '背景图片',
+  ctaButtons: '行动按钮', items: '列表项', cards: '卡片列表', channels: '渠道列表',
+  products: '产品列表', features: '功能列表', events: '事件列表', images: '图片列表',
+  posts: '文章列表', sectionTitle: '板块标题', sectionSubtitle: '板块副标题',
+  value: '数值', unit: '单位', label: '标签', icon: '图标', name: '名称',
+  platform: '平台', url: '链接', linkUrl: '链接地址', link: '链接',
+  year: '年份', caption: '说明', content: '内容', variant: '样式',
 }
 
-function TextFieldEditor({
-  fieldKey,
-  value,
-  onChange,
-}: {
-  fieldKey: string
-  value: string
-  onChange: (val: string) => void
-}) {
+const inputStyle: React.CSSProperties = {
+  width: '100%', padding: '4px 8px', fontSize: '13px',
+  border: '1px solid #d1d5db', borderRadius: '4px',
+  outline: 'none', boxSizing: 'border-box', background: '#fff',
+}
+
+const labelStyle: React.CSSProperties = {
+  display: 'block', fontSize: '11px', fontWeight: 500,
+  color: '#6b7280', marginBottom: '4px',
+}
+
+function TextFieldEditor({ fieldKey, value, onChange }: { fieldKey: string; value: string; onChange: (val: string) => void }) {
   return (
-    <div className="mb-3">
-      <label className="block text-xs font-medium text-gray-600 mb-1">
-        {FIELD_LABELS[fieldKey] || fieldKey}
-      </label>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
-      />
+    <div style={{ marginBottom: '12px' }}>
+      <label style={labelStyle}>{FIELD_LABELS[fieldKey] || fieldKey}</label>
+      <input type="text" value={value} onChange={(e) => onChange(e.target.value)} style={inputStyle} />
     </div>
   )
 }
 
-function TextareaFieldEditor({
-  fieldKey,
-  value,
-  onChange,
-}: {
-  fieldKey: string
-  value: string
-  onChange: (val: string) => void
-}) {
+function TextareaFieldEditor({ fieldKey, value, onChange }: { fieldKey: string; value: string; onChange: (val: string) => void }) {
   return (
-    <div className="mb-3">
-      <label className="block text-xs font-medium text-gray-600 mb-1">
-        {FIELD_LABELS[fieldKey] || fieldKey}
-      </label>
-      <textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        rows={4}
-        className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white resize-y"
-      />
+    <div style={{ marginBottom: '12px' }}>
+      <label style={labelStyle}>{FIELD_LABELS[fieldKey] || fieldKey}</label>
+      <textarea value={value} onChange={(e) => onChange(e.target.value)} rows={4}
+        style={{ ...inputStyle, resize: 'vertical' }} />
     </div>
   )
 }
 
-function ImageFieldEditor({
-  fieldKey,
-  value,
-}: {
-  fieldKey: string
-  value: unknown
-}) {
+function ImageFieldEditor({ fieldKey, value }: { fieldKey: string; value: unknown }) {
   const imageUrl =
     typeof value === 'object' && value !== null && 'url' in (value as Record<string, unknown>)
       ? (value as Record<string, string>).url
-      : typeof value === 'string'
-        ? value
-        : null
+      : typeof value === 'string' ? value : null
 
   return (
-    <div className="mb-3">
-      <label className="block text-xs font-medium text-gray-600 mb-1">
-        {FIELD_LABELS[fieldKey] || fieldKey}
-      </label>
+    <div style={{ marginBottom: '12px' }}>
+      <label style={labelStyle}>{FIELD_LABELS[fieldKey] || fieldKey}</label>
       {imageUrl ? (
-        <div className="relative border border-gray-200 rounded overflow-hidden">
-          <img src={imageUrl} alt="" className="w-full h-24 object-cover" />
-          <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] px-2 py-0.5 truncate">
+        <div style={{ position: 'relative', border: '1px solid #e5e7eb', borderRadius: '4px', overflow: 'hidden' }}>
+          <img src={imageUrl} alt="" style={{ width: '100%', height: '96px', objectFit: 'cover' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.5)', color: '#fff', fontSize: '10px', padding: '2px 8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {imageUrl}
           </div>
         </div>
       ) : (
-        <div className="border border-dashed border-gray-300 rounded p-4 text-center text-xs text-gray-400">
+        <div style={{ border: '1px dashed #d1d5db', borderRadius: '4px', padding: '16px', textAlign: 'center', fontSize: '12px', color: '#9ca3af' }}>
           请在 Payload 后台上传图片
         </div>
       )}
-      <p className="text-[10px] text-gray-400 mt-1">图片请通过 Payload 后台媒体库管理</p>
+      <p style={{ fontSize: '10px', color: '#9ca3af', marginTop: '4px' }}>图片请通过 Payload 后台媒体库管理</p>
     </div>
   )
 }
 
-function ArrayFieldEditor({
-  fieldKey,
-  value,
-  blockId,
-  onUpdateBlock,
-}: {
-  fieldKey: string
-  value: unknown[]
-  blockId: string
+function ArrayFieldEditor({ fieldKey, value, blockId, onUpdateBlock }: {
+  fieldKey: string; value: unknown[]; blockId: string;
   onUpdateBlock: (blockId: string, updates: Partial<BlockItem>) => void
 }) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
@@ -160,61 +103,47 @@ function ArrayFieldEditor({
   }
 
   return (
-    <div className="mb-3">
-      <label className="block text-xs font-medium text-gray-600 mb-1">
-        {FIELD_LABELS[fieldKey] || fieldKey} ({value.length}项)
-      </label>
-      <div className="space-y-1">
+    <div style={{ marginBottom: '12px' }}>
+      <label style={labelStyle}>{FIELD_LABELS[fieldKey] || fieldKey} ({value.length}项)</label>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
         {value.map((item, index) => {
           if (typeof item !== 'object' || item === null) return null
           const itemObj = item as Record<string, unknown>
           const isExpanded = expandedIndex === index
-          const displayName =
-            (itemObj.title as string) ||
-            (itemObj.label as string) ||
-            (itemObj.name as string) ||
-            (itemObj.platform as string) ||
-            (itemObj.value as string) ||
-            `项目 ${index + 1}`
+          const displayName = (itemObj.title as string) || (itemObj.label as string) || (itemObj.name as string) || (itemObj.platform as string) || (itemObj.value as string) || `项目 ${index + 1}`
 
           return (
-            <div key={index} className="border border-gray-200 rounded">
+            <div key={index} style={{ border: '1px solid #e5e7eb', borderRadius: '4px' }}>
               <div
-                className="flex items-center px-2 py-1.5 cursor-pointer hover:bg-gray-50"
+                style={{ display: 'flex', alignItems: 'center', padding: '6px 8px', cursor: 'pointer' }}
                 onClick={() => setExpandedIndex(isExpanded ? null : index)}
+                onMouseOver={(e) => (e.currentTarget.style.background = '#f9fafb')}
+                onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
               >
-                <span className="text-xs text-gray-400 mr-1">{isExpanded ? '▼' : '▶'}</span>
-                <span className="text-xs text-gray-700 flex-1 truncate">{displayName}</span>
-                <span className="text-[10px] text-gray-400">#{index + 1}</span>
+                <span style={{ fontSize: '10px', color: '#9ca3af', marginRight: '4px' }}>{isExpanded ? '▼' : '▶'}</span>
+                <span style={{ fontSize: '12px', color: '#374151', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{displayName}</span>
+                <span style={{ fontSize: '10px', color: '#9ca3af' }}>#{index + 1}</span>
               </div>
               {isExpanded && (
-                <div className="px-2 pb-2 border-t border-gray-100">
+                <div style={{ padding: '0 8px 8px', borderTop: '1px solid #f3f4f6' }}>
                   {Object.entries(itemObj).map(([itemKey, itemValue]) => {
                     if (itemKey === 'id') return null
                     if (typeof itemValue === 'string') {
                       return (
-                        <div key={itemKey} className="mt-2">
-                          <label className="block text-[10px] text-gray-500 mb-0.5">
-                            {FIELD_LABELS[itemKey] || itemKey}
-                          </label>
-                          <input
-                            type="text"
-                            value={itemValue}
-                            onChange={(e) => updateArrayItem(index, itemKey, e.target.value)}
-                            className="w-full px-1.5 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                          />
+                        <div key={itemKey} style={{ marginTop: '8px' }}>
+                          <label style={{ ...labelStyle, fontSize: '10px' }}>{FIELD_LABELS[itemKey] || itemKey}</label>
+                          <input type="text" value={itemValue} onChange={(e) => updateArrayItem(index, itemKey, e.target.value)}
+                            style={{ ...inputStyle, fontSize: '12px', padding: '3px 6px' }} />
                         </div>
                       )
                     }
                     if (typeof itemValue === 'object' && itemValue !== null && 'url' in (itemValue as Record<string, unknown>)) {
                       const url = (itemValue as Record<string, string>).url
                       return (
-                        <div key={itemKey} className="mt-2">
-                          <label className="block text-[10px] text-gray-500 mb-0.5">
-                            {FIELD_LABELS[itemKey] || itemKey}
-                          </label>
-                          {url && <img src={url} alt="" className="w-full h-16 object-cover rounded border" />}
-                          <p className="text-[10px] text-gray-400 mt-0.5">通过 Payload 媒体库管理</p>
+                        <div key={itemKey} style={{ marginTop: '8px' }}>
+                          <label style={{ ...labelStyle, fontSize: '10px' }}>{FIELD_LABELS[itemKey] || itemKey}</label>
+                          {url && <img src={url} alt="" style={{ width: '100%', height: '64px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #e5e7eb' }} />}
+                          <p style={{ fontSize: '10px', color: '#9ca3af', marginTop: '2px' }}>通过 Payload 媒体库管理</p>
                         </div>
                       )
                     }
@@ -241,15 +170,15 @@ export function PropertyPanel({ block, onUpdateBlock }: PropertyPanelProps) {
 
   if (!block) {
     return (
-      <div className="flex flex-col h-full bg-white border-l border-gray-200">
-        <div className="px-3 py-2 border-b border-gray-200 bg-gray-50">
-          <h3 className="text-sm font-semibold text-gray-700">属性面板</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', borderLeft: '1px solid #e5e7eb' }}>
+        <div style={{ padding: '8px 12px', borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
+          <h3 style={{ fontSize: '13px', fontWeight: 600, color: '#374151', margin: 0 }}>属性面板</h3>
         </div>
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center text-gray-400">
-            <div className="text-3xl mb-2">🎯</div>
-            <p className="text-xs">选择一个组件开始编辑</p>
-            <p className="text-[10px] mt-1">点击左侧组件树或画布中的元素</p>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ textAlign: 'center', color: '#9ca3af' }}>
+            <div style={{ fontSize: '32px', marginBottom: '8px' }}>🎯</div>
+            <p style={{ fontSize: '12px' }}>选择一个组件开始编辑</p>
+            <p style={{ fontSize: '10px', marginTop: '4px' }}>点击左侧组件树或画布中的元素</p>
           </div>
         </div>
       </div>
@@ -261,60 +190,35 @@ export function PropertyPanel({ block, onUpdateBlock }: PropertyPanelProps) {
   )
 
   return (
-    <div className="flex flex-col h-full bg-white border-l border-gray-200">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', borderLeft: '1px solid #e5e7eb' }}>
       {/* Header */}
-      <div className="px-3 py-2 border-b border-gray-200 bg-gray-50">
-        <h3 className="text-sm font-semibold text-gray-700">属性面板</h3>
-        <div className="flex items-center mt-1">
-          <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">
+      <div style={{ padding: '8px 12px', borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
+        <h3 style={{ fontSize: '13px', fontWeight: 600, color: '#374151', margin: 0 }}>属性面板</h3>
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: '4px' }}>
+          <span style={{ fontSize: '11px', background: '#dbeafe', color: '#1d4ed8', padding: '2px 6px', borderRadius: '4px' }}>
             {BLOCK_LABELS[block.blockType] || block.blockType}
           </span>
         </div>
       </div>
 
       {/* Fields */}
-      <div className="flex-1 overflow-y-auto px-3 py-2">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 12px' }}>
         {editableFields.map(([key, value]) => {
           const fieldType = detectFieldType(key, value)
-
           switch (fieldType) {
             case 'text':
-              return (
-                <TextFieldEditor
-                  key={key}
-                  fieldKey={key}
-                  value={value as string}
-                  onChange={(val) => handleFieldChange(key, val)}
-                />
-              )
+              return <TextFieldEditor key={key} fieldKey={key} value={value as string} onChange={(val) => handleFieldChange(key, val)} />
             case 'textarea':
-              return (
-                <TextareaFieldEditor
-                  key={key}
-                  fieldKey={key}
-                  value={value as string}
-                  onChange={(val) => handleFieldChange(key, val)}
-                />
-              )
+              return <TextareaFieldEditor key={key} fieldKey={key} value={value as string} onChange={(val) => handleFieldChange(key, val)} />
             case 'image':
               return <ImageFieldEditor key={key} fieldKey={key} value={value} />
             case 'array':
-              return (
-                <ArrayFieldEditor
-                  key={key}
-                  fieldKey={key}
-                  value={value as unknown[]}
-                  blockId={block.id}
-                  onUpdateBlock={onUpdateBlock}
-                />
-              )
+              return <ArrayFieldEditor key={key} fieldKey={key} value={value as unknown[]} blockId={block.id} onUpdateBlock={onUpdateBlock} />
             case 'richtext':
               return (
-                <div key={key} className="mb-3">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
-                    {FIELD_LABELS[key] || key}
-                  </label>
-                  <div className="border border-gray-200 rounded p-2 text-xs text-gray-500 bg-gray-50">
+                <div key={key} style={{ marginBottom: '12px' }}>
+                  <label style={labelStyle}>{FIELD_LABELS[key] || key}</label>
+                  <div style={{ border: '1px solid #e5e7eb', borderRadius: '4px', padding: '8px', fontSize: '12px', color: '#6b7280', background: '#f9fafb' }}>
                     富文本内容 · 请在 Payload 后台编辑
                   </div>
                 </div>
@@ -323,19 +227,16 @@ export function PropertyPanel({ block, onUpdateBlock }: PropertyPanelProps) {
               return null
           }
         })}
-
         {editableFields.length === 0 && (
-          <div className="text-center text-gray-400 py-8">
-            <p className="text-xs">此模块暂无可编辑属性</p>
+          <div style={{ textAlign: 'center', color: '#9ca3af', padding: '32px 0' }}>
+            <p style={{ fontSize: '12px' }}>此模块暂无可编辑属性</p>
           </div>
         )}
       </div>
 
       {/* Footer */}
-      <div className="px-3 py-2 border-t border-gray-200 bg-gray-50">
-        <p className="text-[10px] text-gray-400">
-          修改后点击顶部"保存"按钮提交更改
-        </p>
+      <div style={{ padding: '8px 12px', borderTop: '1px solid #e5e7eb', background: '#f9fafb' }}>
+        <p style={{ fontSize: '10px', color: '#9ca3af', margin: 0 }}>修改后点击顶部"保存"按钮提交更改</p>
       </div>
     </div>
   )

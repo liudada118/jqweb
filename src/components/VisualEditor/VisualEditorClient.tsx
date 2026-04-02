@@ -174,10 +174,8 @@ export function VisualEditorClient({
     if (!pageData || isSaving) return
     setIsSaving(true)
     try {
-      // Clean block IDs that were generated client-side
       const cleanedBlocks = blocks.map((b) => {
         const { id, ...rest } = b
-        // Keep original IDs, remove client-generated ones
         if (id.startsWith('new-') || id.startsWith('block-')) {
           return rest
         }
@@ -195,9 +193,7 @@ export function VisualEditorClient({
 
       if (res.ok) {
         setHasUnsavedChanges(false)
-        // Refresh page data to get server-generated IDs
         await fetchPage(currentSlug)
-        // Reload iframe
         if (iframeRef.current) {
           iframeRef.current.src = iframeRef.current.src
         }
@@ -297,114 +293,173 @@ export function VisualEditorClient({
 
   const selectedBlock = blocks.find((b) => b.id === selectedBlockId) || null
   const deviceSize = DEVICE_SIZES[deviceMode]
-
-  // Build iframe URL - use the frontend page URL
   const iframeUrl = currentSlug === 'home' ? `${baseUrl}/` : `${baseUrl}/${currentSlug}`
 
+  // Use fixed positioning to break out of Payload admin layout constraints
   return (
-    <div className="flex flex-col h-screen bg-gray-100" style={{ fontFamily: "'Noto Sans SC', sans-serif" }}>
-      {/* Toolbar */}
-      <EditorToolbar
-        pages={pages}
-        currentPageSlug={currentSlug}
-        onPageChange={setCurrentSlug}
-        deviceMode={deviceMode}
-        onDeviceModeChange={setDeviceMode}
-        hasUnsavedChanges={hasUnsavedChanges}
-        isSaving={isSaving}
-        onSave={handleSave}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-        canUndo={undoStack.length > 0}
-        canRedo={redoStack.length > 0}
-      />
+    <>
+      <style>{`
+        .ve-root * { box-sizing: border-box; }
+        .ve-root { font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+      `}</style>
+      <div
+        className="ve-root"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 99999,
+          display: 'flex',
+          flexDirection: 'column',
+          background: '#f3f4f6',
+        }}
+      >
+        {/* Toolbar */}
+        <EditorToolbar
+          pages={pages}
+          currentPageSlug={currentSlug}
+          onPageChange={setCurrentSlug}
+          deviceMode={deviceMode}
+          onDeviceModeChange={setDeviceMode}
+          hasUnsavedChanges={hasUnsavedChanges}
+          isSaving={isSaving}
+          onSave={handleSave}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={undoStack.length > 0}
+          canRedo={redoStack.length > 0}
+        />
 
-      {/* Main content */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left panel - Component Tree */}
-        <div style={{ width: leftPanelWidth, minWidth: leftPanelWidth }} className="flex-shrink-0">
-          <ComponentTree
-            blocks={blocks}
-            selectedBlockId={selectedBlockId}
-            onSelectBlock={handleSelectBlock}
-            onMoveBlock={handleMoveBlock}
-            onDeleteBlock={handleDeleteBlock}
+        {/* Main content - three columns */}
+        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+          {/* Left panel - Component Tree */}
+          <div style={{ width: leftPanelWidth, minWidth: leftPanelWidth, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1, overflow: 'hidden' }}>
+              <ComponentTree
+                blocks={blocks}
+                selectedBlockId={selectedBlockId}
+                onSelectBlock={handleSelectBlock}
+                onMoveBlock={handleMoveBlock}
+                onDeleteBlock={handleDeleteBlock}
+              />
+            </div>
+            {/* Add block button */}
+            <div style={{ background: '#fff', borderRight: '1px solid #e5e7eb', padding: '8px 12px' }}>
+              <button
+                onClick={() => setShowAddBlock(true)}
+                style={{
+                  width: '100%',
+                  padding: '6px 0',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color: '#2563eb',
+                  border: '1px dashed #93c5fd',
+                  borderRadius: '4px',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                }}
+                onMouseOver={(e) => (e.currentTarget.style.background = '#eff6ff')}
+                onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
+              >
+                + 添加模块
+              </button>
+            </div>
+          </div>
+
+          {/* Left resize handle */}
+          <div
+            style={{
+              width: '4px',
+              cursor: 'col-resize',
+              background: '#e5e7eb',
+              flexShrink: 0,
+              transition: 'background 0.2s',
+            }}
+            onMouseDown={handleResizeLeft}
+            onMouseOver={(e) => (e.currentTarget.style.background = '#60a5fa')}
+            onMouseOut={(e) => (e.currentTarget.style.background = '#e5e7eb')}
           />
-          {/* Add block button */}
-          <div className="bg-white border-r border-gray-200 px-3 py-2">
-            <button
-              onClick={() => setShowAddBlock(true)}
-              className="w-full py-1.5 text-xs font-medium text-blue-600 border border-blue-300 border-dashed rounded hover:bg-blue-50 transition-colors"
-            >
-              + 添加模块
-            </button>
+
+          {/* Center - Canvas / iframe preview */}
+          <div style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            overflow: 'auto',
+            background: '#d1d5db',
+            padding: '16px',
+          }}>
+            {isLoading ? (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                <div style={{ textAlign: 'center', color: '#6b7280' }}>
+                  <div style={{ fontSize: '36px', marginBottom: '12px' }}>⏳</div>
+                  <p style={{ fontSize: '14px' }}>加载页面数据...</p>
+                </div>
+              </div>
+            ) : (
+              <div
+                style={{
+                  background: '#fff',
+                  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  transition: 'all 0.3s',
+                  width: deviceMode === 'desktop' ? '100%' : `${deviceSize.width}px`,
+                  maxWidth: `${deviceSize.width}px`,
+                  height: deviceMode === 'desktop' ? 'calc(100vh - 60px)' : `${deviceSize.height}px`,
+                }}
+              >
+                <iframe
+                  ref={iframeRef}
+                  src={iframeUrl}
+                  style={{ width: '100%', height: '100%', border: 'none' }}
+                  title="页面预览"
+                  onLoad={() => {
+                    if (iframeRef.current?.contentWindow) {
+                      iframeRef.current.contentWindow.postMessage(
+                        { type: 've-init', blocks: blocks.map((b) => ({ id: b.id, blockType: b.blockType })) },
+                        '*',
+                      )
+                    }
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Right resize handle */}
+          <div
+            style={{
+              width: '4px',
+              cursor: 'col-resize',
+              background: '#e5e7eb',
+              flexShrink: 0,
+              transition: 'background 0.2s',
+            }}
+            onMouseDown={handleResizeRight}
+            onMouseOver={(e) => (e.currentTarget.style.background = '#60a5fa')}
+            onMouseOut={(e) => (e.currentTarget.style.background = '#e5e7eb')}
+          />
+
+          {/* Right panel - Property Panel */}
+          <div style={{ width: rightPanelWidth, minWidth: rightPanelWidth, flexShrink: 0 }}>
+            <PropertyPanel
+              block={selectedBlock}
+              onUpdateBlock={handleUpdateBlock}
+            />
           </div>
         </div>
 
-        {/* Left resize handle */}
-        <div
-          className="w-1 cursor-col-resize bg-gray-200 hover:bg-blue-400 transition-colors flex-shrink-0"
-          onMouseDown={handleResizeLeft}
+        {/* Add Block Dialog */}
+        <AddBlockDialog
+          isOpen={showAddBlock}
+          onClose={() => setShowAddBlock(false)}
+          onAddBlock={handleAddBlock}
         />
-
-        {/* Center - Canvas / iframe preview */}
-        <div className="flex-1 flex items-start justify-center overflow-auto bg-gray-200 p-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center text-gray-500">
-                <div className="text-4xl mb-3 animate-pulse">⏳</div>
-                <p className="text-sm">加载页面数据...</p>
-              </div>
-            </div>
-          ) : (
-            <div
-              className="bg-white shadow-lg rounded-lg overflow-hidden transition-all duration-300"
-              style={{
-                width: deviceMode === 'desktop' ? '100%' : deviceSize.width,
-                maxWidth: deviceSize.width,
-                height: deviceMode === 'desktop' ? 'calc(100vh - 60px)' : deviceSize.height,
-              }}
-            >
-              <iframe
-                ref={iframeRef}
-                src={iframeUrl}
-                className="w-full h-full border-0"
-                title="页面预览"
-                onLoad={() => {
-                  // Inject the visual editor script into the iframe
-                  if (iframeRef.current?.contentWindow) {
-                    iframeRef.current.contentWindow.postMessage(
-                      { type: 've-init', blocks: blocks.map((b) => ({ id: b.id, blockType: b.blockType })) },
-                      '*',
-                    )
-                  }
-                }}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Right resize handle */}
-        <div
-          className="w-1 cursor-col-resize bg-gray-200 hover:bg-blue-400 transition-colors flex-shrink-0"
-          onMouseDown={handleResizeRight}
-        />
-
-        {/* Right panel - Property Panel */}
-        <div style={{ width: rightPanelWidth, minWidth: rightPanelWidth }} className="flex-shrink-0">
-          <PropertyPanel
-            block={selectedBlock}
-            onUpdateBlock={handleUpdateBlock}
-          />
-        </div>
       </div>
-
-      {/* Add Block Dialog */}
-      <AddBlockDialog
-        isOpen={showAddBlock}
-        onClose={() => setShowAddBlock(false)}
-        onAddBlock={handleAddBlock}
-      />
-    </div>
+    </>
   )
 }

@@ -57,23 +57,31 @@ export function ComponentTree({
     : blocks
 
   return (
-    <div className="flex flex-col h-full bg-white border-r border-gray-200">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', borderRight: '1px solid #e5e7eb' }}>
       {/* Header */}
-      <div className="px-3 py-2 border-b border-gray-200 bg-gray-50">
-        <h3 className="text-sm font-semibold text-gray-700 mb-2">组件结构</h3>
+      <div style={{ padding: '8px 12px', borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
+        <h3 style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px', margin: 0, marginBlockEnd: '8px' }}>组件结构</h3>
         <input
           type="text"
           placeholder="搜索组件..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+          style={{
+            width: '100%',
+            padding: '4px 8px',
+            fontSize: '12px',
+            border: '1px solid #d1d5db',
+            borderRadius: '4px',
+            outline: 'none',
+            boxSizing: 'border-box',
+          }}
         />
       </div>
 
       {/* Tree */}
-      <div className="flex-1 overflow-y-auto py-1">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '4px 0' }}>
         {filteredBlocks.length === 0 ? (
-          <div className="px-3 py-4 text-xs text-gray-400 text-center">暂无内容块</div>
+          <div style={{ padding: '16px 12px', fontSize: '12px', color: '#9ca3af', textAlign: 'center' }}>暂无内容块</div>
         ) : (
           filteredBlocks.map((block, index) => {
             const isSelected = selectedBlockId === block.id
@@ -102,16 +110,28 @@ export function ComponentTree({
                   setDragIndex(null)
                   setDragOverIndex(null)
                 }}
-                className={`
-                  border-l-2 transition-all
-                  ${isSelected ? 'border-l-blue-500 bg-blue-50' : 'border-l-transparent hover:bg-gray-50'}
-                  ${isDragOver ? 'border-t-2 border-t-blue-400' : ''}
-                `}
+                style={{
+                  borderLeft: isSelected ? '3px solid #3b82f6' : '3px solid transparent',
+                  background: isSelected ? '#eff6ff' : 'transparent',
+                  borderTop: isDragOver ? '2px solid #60a5fa' : '2px solid transparent',
+                  transition: 'all 0.15s',
+                }}
               >
                 {/* Block header */}
                 <div
-                  className="flex items-center px-2 py-1.5 cursor-pointer group"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '6px 8px',
+                    cursor: 'pointer',
+                  }}
                   onClick={() => onSelectBlock(block.id)}
+                  onMouseOver={(e) => {
+                    if (!isSelected) e.currentTarget.style.background = '#f9fafb'
+                  }}
+                  onMouseOut={(e) => {
+                    if (!isSelected) e.currentTarget.style.background = 'transparent'
+                  }}
                 >
                   {/* Expand toggle */}
                   {children.length > 0 ? (
@@ -120,27 +140,50 @@ export function ComponentTree({
                         e.stopPropagation()
                         toggleExpand(block.id)
                       }}
-                      className="mr-1 text-gray-400 hover:text-gray-600 w-4 h-4 flex items-center justify-center text-xs"
+                      style={{
+                        marginRight: '4px',
+                        color: '#9ca3af',
+                        width: '16px',
+                        height: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '10px',
+                        border: 'none',
+                        background: 'transparent',
+                        cursor: 'pointer',
+                        padding: 0,
+                      }}
                     >
                       {isExpanded ? '▼' : '▶'}
                     </button>
                   ) : (
-                    <span className="mr-1 w-4" />
+                    <span style={{ marginRight: '4px', width: '16px', display: 'inline-block' }} />
                   )}
 
                   {/* Icon */}
-                  <span className="mr-1.5 text-sm">{BLOCK_ICONS[block.blockType] || '📦'}</span>
+                  <span style={{ marginRight: '6px', fontSize: '14px' }}>{BLOCK_ICONS[block.blockType] || '📦'}</span>
 
                   {/* Label */}
-                  <span className={`text-xs flex-1 truncate ${isSelected ? 'text-blue-700 font-medium' : 'text-gray-700'}`}>
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      flex: 1,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      color: isSelected ? '#1d4ed8' : '#374151',
+                      fontWeight: isSelected ? 500 : 400,
+                    }}
+                  >
                     {BLOCK_LABELS[block.blockType] || block.blockType}
                   </span>
 
                   {/* Index badge */}
-                  <span className="text-[10px] text-gray-400 mr-1">#{index + 1}</span>
+                  <span style={{ fontSize: '10px', color: '#9ca3af', marginRight: '4px' }}>#{index + 1}</span>
 
                   {/* Drag handle */}
-                  <span className="text-gray-300 group-hover:text-gray-500 cursor-grab text-xs">⋮⋮</span>
+                  <span style={{ color: '#d1d5db', cursor: 'grab', fontSize: '12px' }}>⋮⋮</span>
 
                   {/* Delete button */}
                   <button
@@ -150,7 +193,17 @@ export function ComponentTree({
                         onDeleteBlock(block.id)
                       }
                     }}
-                    className="ml-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                    style={{
+                      marginLeft: '4px',
+                      color: '#d1d5db',
+                      fontSize: '12px',
+                      border: 'none',
+                      background: 'transparent',
+                      cursor: 'pointer',
+                      padding: '0 2px',
+                    }}
+                    onMouseOver={(e) => (e.currentTarget.style.color = '#ef4444')}
+                    onMouseOut={(e) => (e.currentTarget.style.color = '#d1d5db')}
                     title="删除模块"
                   >
                     ✕
@@ -159,16 +212,25 @@ export function ComponentTree({
 
                 {/* Children */}
                 {isExpanded && children.length > 0 && (
-                  <div className="pl-7 pb-1">
+                  <div style={{ paddingLeft: '28px', paddingBottom: '4px' }}>
                     {children.map((child) => (
                       <div
                         key={child.key}
-                        className="flex items-center py-0.5 text-[11px] text-gray-500 hover:text-gray-700 cursor-pointer"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '2px 0',
+                          fontSize: '11px',
+                          color: '#6b7280',
+                          cursor: 'pointer',
+                        }}
                         onClick={() => onSelectBlock(block.id)}
                       >
-                        <span className="text-gray-400 mr-1">·</span>
-                        <span className="text-gray-500 mr-1">{child.label}:</span>
-                        <span className="truncate text-gray-600">{child.value}</span>
+                        <span style={{ color: '#9ca3af', marginRight: '4px' }}>·</span>
+                        <span style={{ color: '#6b7280', marginRight: '4px' }}>{child.label}:</span>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#4b5563' }}>
+                          {child.value}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -180,8 +242,8 @@ export function ComponentTree({
       </div>
 
       {/* Footer info */}
-      <div className="px-3 py-2 border-t border-gray-200 bg-gray-50">
-        <div className="text-[10px] text-gray-400">
+      <div style={{ padding: '8px 12px', borderTop: '1px solid #e5e7eb', background: '#f9fafb' }}>
+        <div style={{ fontSize: '10px', color: '#9ca3af' }}>
           共 {blocks.length} 个模块 · 拖拽排序
         </div>
       </div>

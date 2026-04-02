@@ -18,6 +18,16 @@ interface EditorToolbarProps {
   canRedo: boolean
 }
 
+const btnBase: React.CSSProperties = {
+  padding: '4px 8px',
+  borderRadius: '4px',
+  fontSize: '12px',
+  border: 'none',
+  cursor: 'pointer',
+  transition: 'background 0.2s',
+  background: 'transparent',
+}
+
 export function EditorToolbar({
   pages,
   currentPageSlug,
@@ -33,22 +43,41 @@ export function EditorToolbar({
   canRedo,
 }: EditorToolbarProps) {
   return (
-    <div className="flex items-center h-11 px-3 bg-white border-b border-gray-200 gap-2">
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        height: '44px',
+        padding: '0 12px',
+        background: '#fff',
+        borderBottom: '1px solid #e5e7eb',
+        gap: '8px',
+        flexShrink: 0,
+      }}
+    >
       {/* Logo / Title */}
-      <div className="flex items-center mr-3">
-        <span className="text-sm font-bold text-gray-800">🎨 可视化编辑器</span>
+      <div style={{ display: 'flex', alignItems: 'center', marginRight: '12px' }}>
+        <span style={{ fontSize: '14px', fontWeight: 700, color: '#1f2937' }}>🎨 可视化编辑器</span>
       </div>
 
       {/* Divider */}
-      <div className="w-px h-6 bg-gray-200" />
+      <div style={{ width: '1px', height: '24px', background: '#e5e7eb' }} />
 
       {/* Page selector */}
-      <div className="flex items-center gap-1">
-        <span className="text-xs text-gray-500">页面:</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <span style={{ fontSize: '12px', color: '#6b7280' }}>页面:</span>
         <select
           value={currentPageSlug}
           onChange={(e) => onPageChange(e.target.value)}
-          className="text-xs border border-gray-300 rounded px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+          style={{
+            fontSize: '12px',
+            border: '1px solid #d1d5db',
+            borderRadius: '4px',
+            padding: '4px 8px',
+            background: '#fff',
+            outline: 'none',
+            cursor: 'pointer',
+          }}
         >
           {pages.map((page) => (
             <option key={page.slug} value={page.slug}>
@@ -59,78 +88,76 @@ export function EditorToolbar({
       </div>
 
       {/* Divider */}
-      <div className="w-px h-6 bg-gray-200" />
+      <div style={{ width: '1px', height: '24px', background: '#e5e7eb' }} />
 
       {/* Device mode */}
-      <div className="flex items-center gap-0.5">
-        <button
-          onClick={() => onDeviceModeChange('desktop')}
-          className={`px-2 py-1 rounded text-xs transition-colors ${
-            deviceMode === 'desktop'
-              ? 'bg-blue-100 text-blue-700'
-              : 'text-gray-500 hover:bg-gray-100'
-          }`}
-          title="桌面"
-        >
-          🖥️
-        </button>
-        <button
-          onClick={() => onDeviceModeChange('tablet')}
-          className={`px-2 py-1 rounded text-xs transition-colors ${
-            deviceMode === 'tablet'
-              ? 'bg-blue-100 text-blue-700'
-              : 'text-gray-500 hover:bg-gray-100'
-          }`}
-          title="平板"
-        >
-          📱
-        </button>
-        <button
-          onClick={() => onDeviceModeChange('mobile')}
-          className={`px-2 py-1 rounded text-xs transition-colors ${
-            deviceMode === 'mobile'
-              ? 'bg-blue-100 text-blue-700'
-              : 'text-gray-500 hover:bg-gray-100'
-          }`}
-          title="手机"
-        >
-          📲
-        </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+        {(['desktop', 'tablet', 'mobile'] as DeviceMode[]).map((mode) => {
+          const icons = { desktop: '🖥️', tablet: '📱', mobile: '📲' }
+          const labels = { desktop: '桌面', tablet: '平板', mobile: '手机' }
+          const isActive = deviceMode === mode
+          return (
+            <button
+              key={mode}
+              onClick={() => onDeviceModeChange(mode)}
+              title={labels[mode]}
+              style={{
+                ...btnBase,
+                background: isActive ? '#dbeafe' : 'transparent',
+                color: isActive ? '#1d4ed8' : '#6b7280',
+              }}
+            >
+              {icons[mode]}
+            </button>
+          )
+        })}
       </div>
 
       {/* Divider */}
-      <div className="w-px h-6 bg-gray-200" />
+      <div style={{ width: '1px', height: '24px', background: '#e5e7eb' }} />
 
       {/* Undo / Redo */}
-      <div className="flex items-center gap-0.5">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
         <button
           onClick={onUndo}
           disabled={!canUndo}
-          className={`px-2 py-1 rounded text-xs transition-colors ${
-            canUndo ? 'text-gray-600 hover:bg-gray-100' : 'text-gray-300 cursor-not-allowed'
-          }`}
-          title="撤销"
+          title="撤销 (Ctrl+Z)"
+          style={{
+            ...btnBase,
+            color: canUndo ? '#4b5563' : '#d1d5db',
+            cursor: canUndo ? 'pointer' : 'not-allowed',
+          }}
         >
           ↩️
         </button>
         <button
           onClick={onRedo}
           disabled={!canRedo}
-          className={`px-2 py-1 rounded text-xs transition-colors ${
-            canRedo ? 'text-gray-600 hover:bg-gray-100' : 'text-gray-300 cursor-not-allowed'
-          }`}
-          title="重做"
+          title="重做 (Ctrl+Shift+Z)"
+          style={{
+            ...btnBase,
+            color: canRedo ? '#4b5563' : '#d1d5db',
+            cursor: canRedo ? 'pointer' : 'not-allowed',
+          }}
         >
           ↪️
         </button>
       </div>
 
       {/* Spacer */}
-      <div className="flex-1" />
+      <div style={{ flex: 1 }} />
 
       {/* Unsaved indicator */}
       {hasUnsavedChanges && (
-        <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded">
+        <span
+          style={{
+            fontSize: '12px',
+            color: '#d97706',
+            background: '#fffbeb',
+            padding: '2px 8px',
+            borderRadius: '4px',
+          }}
+        >
           ● 有未保存的更改
         </span>
       )}
@@ -139,22 +166,37 @@ export function EditorToolbar({
       <button
         onClick={onSave}
         disabled={isSaving || !hasUnsavedChanges}
-        className={`px-4 py-1.5 rounded text-xs font-medium transition-colors ${
-          hasUnsavedChanges && !isSaving
-            ? 'bg-blue-600 text-white hover:bg-blue-700'
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-        }`}
+        style={{
+          padding: '6px 16px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          fontWeight: 500,
+          border: 'none',
+          cursor: hasUnsavedChanges && !isSaving ? 'pointer' : 'not-allowed',
+          background: hasUnsavedChanges && !isSaving ? '#2563eb' : '#e5e7eb',
+          color: hasUnsavedChanges && !isSaving ? '#fff' : '#9ca3af',
+          transition: 'background 0.2s',
+        }}
       >
         {isSaving ? '保存中...' : '保存'}
       </button>
 
-      {/* Open in Payload */}
+      {/* Back to Payload admin */}
       <a
-        href="/admin/collections/pages"
-        className="px-3 py-1.5 rounded text-xs font-medium text-gray-600 border border-gray-300 hover:bg-gray-50 transition-colors"
-        title="在 Payload 后台中打开"
+        href="/admin"
+        style={{
+          padding: '6px 12px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          fontWeight: 500,
+          color: '#4b5563',
+          border: '1px solid #d1d5db',
+          textDecoration: 'none',
+          transition: 'background 0.2s',
+        }}
+        title="返回 Payload 后台"
       >
-        Payload 后台
+        ← 返回后台
       </a>
     </div>
   )
