@@ -181,9 +181,10 @@ export function EditorToolbar({
         {isSaving ? '保存中...' : '保存'}
       </button>
 
-      {/* Back to Payload admin */}
+      {/* View frontend */}
       <a
-        href="/admin"
+        href="/"
+        target="_blank"
         style={{
           padding: '6px 12px',
           borderRadius: '4px',
@@ -194,9 +195,28 @@ export function EditorToolbar({
           textDecoration: 'none',
           transition: 'background 0.2s',
         }}
-        title="返回 Payload 后台"
+        title="查看前台网站"
       >
-        ← 返回后台
+        🌐 查看前台
+      </a>
+
+      {/* Payload admin for media/posts management */}
+      <a
+        href="/admin/collections/media"
+        target="_blank"
+        style={{
+          padding: '6px 12px',
+          borderRadius: '4px',
+          fontSize: '12px',
+          fontWeight: 500,
+          color: '#4b5563',
+          border: '1px solid #d1d5db',
+          textDecoration: 'none',
+          transition: 'background 0.2s',
+        }}
+        title="管理媒体库和文章"
+      >
+        🗂️ 媒体管理
       </a>
     </div>
   )

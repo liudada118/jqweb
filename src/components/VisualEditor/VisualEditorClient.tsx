@@ -320,10 +320,25 @@ export function VisualEditorClient({
           setSelectedBlockId(blockId)
         }
       }
+      // Handle inline text edits from iframe
+      if (event.data?.type === 've-inline-edit') {
+        const { blockId, fieldKey, newValue } = event.data
+        if (blockId && fieldKey && newValue !== undefined) {
+          // Push undo state
+          setUndoStack((prev) => [...prev.slice(-20), JSON.parse(JSON.stringify(blocks))])
+          setRedoStack([])
+          // Update the block field
+          setBlocks((prev) =>
+            prev.map((b) => (b.id === blockId ? { ...b, [fieldKey]: newValue } : b)),
+          )
+          setHasUnsavedChanges(true)
+          setSelectedBlockId(blockId)
+        }
+      }
     }
     window.addEventListener('message', handler)
     return () => window.removeEventListener('message', handler)
-  }, [])
+  }, [blocks])
 
   // Keyboard shortcuts
   useEffect(() => {

@@ -1,67 +1,46 @@
-import { Banner } from '@payloadcms/ui/elements/Banner'
-import React from 'react'
+'use client'
 
-import { SeedButton } from './SeedButton'
-import './index.scss'
+import React, { useEffect } from 'react'
 
-const baseClass = 'before-dashboard'
-
+/**
+ * BeforeDashboard component - automatically redirects to the Visual Editor
+ * when the user accesses the Payload admin dashboard.
+ */
 const BeforeDashboard: React.FC = () => {
+  useEffect(() => {
+    // Redirect to visual editor immediately
+    window.location.href = '/admin/visual-editor'
+  }, [])
+
   return (
-    <div className={baseClass}>
-      <Banner className={`${baseClass}__banner`} type="success">
-        <h4>Welcome to your dashboard!</h4>
-      </Banner>
-      Here&apos;s what to do next:
-      <ul className={`${baseClass}__instructions`}>
-        <li>
-          <SeedButton />
-          {' with a few pages, posts, and projects to jump-start your new site, then '}
-          <a href="/" target="_blank">
-            visit your website
-          </a>
-          {' to see the results.'}
-        </li>
-        <li>
-          {'Modify your '}
-          <a
-            href="https://payloadcms.com/docs/configuration/collections"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            collections
-          </a>
-          {' and add more '}
-          <a
-            href="https://payloadcms.com/docs/fields/overview"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            fields
-          </a>
-          {' as needed. If you are new to Payload, we also recommend you check out the '}
-          <a
-            href="https://payloadcms.com/docs/getting-started/what-is-payload"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Getting Started
-          </a>
-          {' docs.'}
-        </li>
-        <li>
-          Commit and push your changes to the repository to trigger a redeployment of your project.
-        </li>
-      </ul>
-      {'Pro Tip: This block is a '}
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '60vh',
+      flexDirection: 'column',
+      gap: '12px',
+    }}>
+      <div style={{
+        width: '40px',
+        height: '40px',
+        border: '3px solid #e5e7eb',
+        borderTopColor: '#3b82f6',
+        borderRadius: '50%',
+        animation: 'spin 0.8s linear infinite',
+      }} />
+      <p style={{ fontSize: '14px', color: '#6b7280' }}>正在跳转到可视化编辑器...</p>
       <a
-        href="https://payloadcms.com/docs/custom-components/overview"
-        rel="noopener noreferrer"
-        target="_blank"
+        href="/admin/visual-editor"
+        style={{ fontSize: '12px', color: '#3b82f6', textDecoration: 'underline' }}
       >
-        custom component
+        如果没有自动跳转，请点击这里
       </a>
-      , you can remove it at any time by updating your <strong>payload.config</strong>.
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }

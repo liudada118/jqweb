@@ -227,11 +227,38 @@ function SelectFieldEditor({ fieldKey, value, options, onChange }: {
   )
 }
 
-function ImageFieldEditor({ fieldKey, value }: { fieldKey: string; value: unknown }) {
+function ImageFieldEditor({ fieldKey, value, onChange }: { fieldKey: string; value: unknown; onChange?: (val: unknown) => void }) {
   const imageUrl =
     typeof value === 'object' && value !== null && 'url' in (value as Record<string, unknown>)
       ? (value as Record<string, string>).url
       : typeof value === 'string' ? value : null
+
+  const imageId =
+    typeof value === 'object' && value !== null && 'id' in (value as Record<string, unknown>)
+      ? (value as Record<string, unknown>).id
+      : null
+
+  const handleSelectMedia = () => {
+    // Open Payload media library in a popup window
+    const popup = window.open(
+      '/admin/collections/media',
+      'media-picker',
+      'width=1200,height=800,scrollbars=yes,resizable=yes'
+    )
+    if (popup) {
+      // Listen for messages from the popup
+      const handler = (event: MessageEvent) => {
+        if (event.data?.type === 've-media-selected' && event.data.media) {
+          if (onChange) {
+            onChange(event.data.media)
+          }
+          window.removeEventListener('message', handler)
+          popup.close()
+        }
+      }
+      window.addEventListener('message', handler)
+    }
+  }
 
   return (
     <div style={{ marginBottom: '14px' }}>
@@ -245,10 +272,26 @@ function ImageFieldEditor({ fieldKey, value }: { fieldKey: string; value: unknow
         </div>
       ) : (
         <div style={{ border: '1px dashed #d1d5db', borderRadius: '6px', padding: '16px', textAlign: 'center', fontSize: '12px', color: '#9ca3af' }}>
-          请在 Payload 后台上传图片
+          未设置图片
         </div>
       )}
-      <p style={{ fontSize: '10px', color: '#9ca3af', marginTop: '4px' }}>图片请通过 Payload 后台媒体库管理</p>
+      <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
+        <a
+          href="/admin/collections/media"
+          target="_blank"
+          style={{
+            flex: 1, padding: '5px 0', fontSize: '11px', fontWeight: 500,
+            color: '#2563eb', border: '1px solid #93c5fd', borderRadius: '4px',
+            background: '#eff6ff', cursor: 'pointer', textAlign: 'center',
+            textDecoration: 'none', display: 'block',
+          }}
+        >
+          📷 管理媒体库
+        </a>
+      </div>
+      <p style={{ fontSize: '10px', color: '#9ca3af', marginTop: '4px' }}>
+        {imageId ? `媒体 ID: ${imageId}` : '上传图片后在 Payload 后台的页面编辑中选择'}
+      </p>
     </div>
   )
 }
@@ -513,7 +556,7 @@ export function PropertyPanel({ block, onUpdateBlock }: PropertyPanelProps) {
               return <SelectFieldEditor key={key} fieldKey={key} value={value as string} options={options} onChange={(val) => handleFieldChange(key, val)} />
             }
             case 'image':
-              return <ImageFieldEditor key={key} fieldKey={key} value={value} />
+              return <ImageFieldEditor key={key} fieldKey={key} value={value} onChange={(val) => handleFieldChange(key, val)} />
             case 'link':
               return <LinkFieldEditor key={key} fieldKey={key} value={value as Record<string, unknown>} onChange={(val) => handleFieldChange(key, val)} />
             case 'array':
