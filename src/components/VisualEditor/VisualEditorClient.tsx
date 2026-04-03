@@ -14,6 +14,68 @@ interface VisualEditorClientProps {
   baseUrl: string
 }
 
+/**
+ * Flatten relationship fields for Payload save.
+ * When depth=2, relationship fields (media, backgroundImage, etc.) are expanded
+ * to full objects like { id: '123', url: '...', ... }.
+ * Payload expects just the ID string when saving.
+ */
+function flattenRelationships(obj: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = {}
+
+  // Known relationship field keys (media/image fields that reference other collections)
+  const RELATIONSHIP_KEYS = [
+    'backgroundImage', 'image', 'media', 'coverImage', 'qrCode',
+    'logo', 'icon', 'thumbnail', 'avatar', 'photo', 'file',
+  ]
+
+  for (const [key, value] of Object.entries(obj)) {
+    if (value === null || value === undefined) {
+      result[key] = value
+      continue
+    }
+
+    // Handle relationship fields - flatten object to ID
+    if (RELATIONSHIP_KEYS.includes(key) && typeof value === 'object' && !Array.isArray(value)) {
+      const objVal = value as Record<string, unknown>
+      if (objVal.id) {
+        result[key] = objVal.id
+      } else {
+        result[key] = value
+      }
+      continue
+    }
+
+    // Handle arrays - recursively flatten items
+    if (Array.isArray(value)) {
+      result[key] = value.map((item) => {
+        if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
+          return flattenRelationships(item as Record<string, unknown>)
+        }
+        return item
+      })
+      continue
+    }
+
+    // Handle nested objects (like link objects) - recursively flatten
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      const objVal = value as Record<string, unknown>
+      // If it looks like a Payload document (has id, createdAt, updatedAt), flatten to ID
+      if (objVal.id && objVal.createdAt && objVal.updatedAt) {
+        result[key] = objVal.id
+        continue
+      }
+      // Otherwise recursively process
+      result[key] = flattenRelationships(objVal)
+      continue
+    }
+
+    result[key] = value
+  }
+
+  return result
+}
+
 export function VisualEditorClient({
   initialPages,
   initialSlug,
@@ -31,6 +93,7 @@ export function VisualEditorClient({
   const [showAddBlock, setShowAddBlock] = useState(false)
   const [leftPanelWidth, setLeftPanelWidth] = useState(260)
   const [rightPanelWidth, setRightPanelWidth] = useState(300)
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   // Undo/Redo
   const [undoStack, setUndoStack] = useState<BlockItem[][]>([])
@@ -45,6 +108,14 @@ export function VisualEditorClient({
       setClientOrigin(window.location.origin)
     }
   }, [])
+
+  // Auto-dismiss save message
+  useEffect(() => {
+    if (saveMessage) {
+      const timer = setTimeout(() => setSaveMessage(null), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [saveMessage])
 
   // Fetch page data
   const fetchPage = useCallback(
@@ -83,7 +154,7 @@ export function VisualEditorClient({
 
   // Push to undo stack before making changes
   const pushUndo = useCallback(() => {
-    setUndoStack((prev) => [...prev.slice(-20), blocks.map((b) => ({ ...b }))])
+    setUndoStack((prev) => [...prev.slice(-20), JSON.parse(JSON.stringify(blocks))])
     setRedoStack([])
   }, [blocks])
 
@@ -133,6 +204,7 @@ export function VisualEditorClient({
   // Delete block
   const handleDeleteBlock = useCallback(
     (blockId: string) => {
+      if (!confirm('确定要删除此模块吗？')) return
       pushUndo()
       setBlocks((prev) => prev.filter((b) => b.id !== blockId))
       if (selectedBlockId === blockId) setSelectedBlockId(null)
@@ -160,7 +232,7 @@ export function VisualEditorClient({
   // Undo
   const handleUndo = useCallback(() => {
     if (undoStack.length === 0) return
-    setRedoStack((prev) => [...prev, blocks.map((b) => ({ ...b }))])
+    setRedoStack((prev) => [...prev, JSON.parse(JSON.stringify(blocks))])
     const previous = undoStack[undoStack.length - 1]
     setUndoStack((prev) => prev.slice(0, -1))
     setBlocks(previous)
@@ -170,24 +242,28 @@ export function VisualEditorClient({
   // Redo
   const handleRedo = useCallback(() => {
     if (redoStack.length === 0) return
-    setUndoStack((prev) => [...prev, blocks.map((b) => ({ ...b }))])
+    setUndoStack((prev) => [...prev, JSON.parse(JSON.stringify(blocks))])
     const next = redoStack[redoStack.length - 1]
     setRedoStack((prev) => prev.slice(0, -1))
     setBlocks(next)
     setHasUnsavedChanges(true)
   }, [redoStack, blocks])
 
-  // Save
+  // Save - with relationship flattening
   const handleSave = useCallback(async () => {
     if (!pageData || isSaving) return
     setIsSaving(true)
+    setSaveMessage(null)
     try {
+      // Clean blocks: remove temporary IDs and flatten relationship fields
       const cleanedBlocks = blocks.map((b) => {
-        const { id, ...rest } = b
-        if (id.startsWith('new-') || id.startsWith('block-')) {
+        const cleaned = flattenRelationships(b as unknown as Record<string, unknown>) as BlockItem
+        // Remove temporary IDs (new- or block- prefixed)
+        if (cleaned.id && (cleaned.id.startsWith('new-') || cleaned.id.startsWith('block-'))) {
+          const { id, ...rest } = cleaned
           return rest
         }
-        return b
+        return cleaned
       })
 
       const res = await fetch(`/api/pages/${pageData.id}?draft=true`, {
@@ -201,6 +277,7 @@ export function VisualEditorClient({
 
       if (res.ok) {
         setHasUnsavedChanges(false)
+        setSaveMessage({ type: 'success', text: '保存成功！' })
         // Reload page data and refresh iframe
         await fetchPage(currentSlug)
         if (iframeRef.current) {
@@ -209,11 +286,12 @@ export function VisualEditorClient({
       } else {
         const errorData = await res.json()
         console.error('Save failed:', errorData)
-        alert('保存失败，请检查控制台')
+        const errorMsg = errorData?.errors?.[0]?.message || errorData?.message || '保存失败，请检查控制台'
+        setSaveMessage({ type: 'error', text: errorMsg })
       }
     } catch (err) {
       console.error('Save error:', err)
-      alert('保存失败')
+      setSaveMessage({ type: 'error', text: '网络错误，保存失败' })
     } finally {
       setIsSaving(false)
     }
@@ -344,6 +422,27 @@ export function VisualEditorClient({
           canRedo={redoStack.length > 0}
         />
 
+        {/* Save message toast */}
+        {saveMessage && (
+          <div style={{
+            position: 'fixed',
+            top: '56px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 100001,
+            padding: '8px 20px',
+            borderRadius: '6px',
+            fontSize: '13px',
+            fontWeight: 500,
+            color: '#fff',
+            background: saveMessage.type === 'success' ? '#16a34a' : '#dc2626',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            animation: 'veToastIn 0.3s ease',
+          }}>
+            {saveMessage.type === 'success' ? '✓ ' : '✕ '}{saveMessage.text}
+          </div>
+        )}
+
         {/* Main content - three columns */}
         <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
           {/* Left panel - Component Tree */}
@@ -472,6 +571,13 @@ export function VisualEditorClient({
           onAddBlock={handleAddBlock}
         />
       </div>
+
+      <style>{`
+        @keyframes veToastIn {
+          from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+      `}</style>
     </>
   )
 }
