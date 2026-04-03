@@ -3,14 +3,14 @@ import type { Metadata } from 'next'
 import { cn } from '@/utilities/ui'
 import { GeistMono } from 'geist/font/mono'
 import { GeistSans } from 'geist/font/sans'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 import { AdminBar } from '@/components/AdminBar'
 import { Footer } from '@/Footer/Component'
 import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
-import { VisualEditorScript } from '@/components/VisualEditor/VisualEditorScript'
+import { VisualEditorDetector } from '@/components/VisualEditor/VisualEditorDetector'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { draftMode } from 'next/headers'
 
@@ -32,16 +32,28 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <Providers>
-          <AdminBar
-            adminBarProps={{
-              preview: isEnabled,
-            }}
-          />
+          {/* 
+            VisualEditorDetector is a client component that checks for ?ve=1 or iframe context.
+            It hides the AdminBar, Header, Footer when in visual editor mode using CSS.
+          */}
+          <Suspense fallback={null}>
+            <VisualEditorDetector />
+          </Suspense>
 
-          <Header />
+          <div className="ve-chrome">
+            <AdminBar
+              adminBarProps={{
+                preview: isEnabled,
+              }}
+            />
+            <Header />
+          </div>
+
           <main className="flex-1">{children}</main>
-          <Footer />
-          <VisualEditorScript />
+
+          <div className="ve-chrome">
+            <Footer />
+          </div>
         </Providers>
       </body>
     </html>

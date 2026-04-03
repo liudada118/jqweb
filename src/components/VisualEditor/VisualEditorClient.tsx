@@ -38,6 +38,14 @@ export function VisualEditorClient({
 
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
+  // Use client-side origin for iframe URL to avoid cross-origin issues
+  const [clientOrigin, setClientOrigin] = useState(baseUrl)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setClientOrigin(window.location.origin)
+    }
+  }, [])
+
   // Fetch page data
   const fetchPage = useCallback(
     async (slug: string) => {
@@ -193,6 +201,7 @@ export function VisualEditorClient({
 
       if (res.ok) {
         setHasUnsavedChanges(false)
+        // Reload page data and refresh iframe
         await fetchPage(currentSlug)
         if (iframeRef.current) {
           iframeRef.current.src = iframeRef.current.src
@@ -293,14 +302,17 @@ export function VisualEditorClient({
 
   const selectedBlock = blocks.find((b) => b.id === selectedBlockId) || null
   const deviceSize = DEVICE_SIZES[deviceMode]
-  const iframeUrl = currentSlug === 'home' ? `${baseUrl}/` : `${baseUrl}/${currentSlug}`
 
-  // Use fixed positioning to break out of Payload admin layout constraints
+  // Build iframe URL using client origin and add ?ve=1 to signal visual editor mode
+  const iframePath = currentSlug === 'home' ? '/' : `/${currentSlug}`
+  const iframeUrl = `${clientOrigin}${iframePath}?ve=1`
+
   return (
     <>
       <style>{`
-        .ve-root * { box-sizing: border-box; }
+        .ve-root * { box-sizing: border-box; margin: 0; padding: 0; }
         .ve-root { font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        .ve-root select, .ve-root input, .ve-root textarea, .ve-root button { font-family: inherit; }
       `}</style>
       <div
         className="ve-root"
@@ -389,11 +401,11 @@ export function VisualEditorClient({
             alignItems: 'flex-start',
             justifyContent: 'center',
             overflow: 'auto',
-            background: '#d1d5db',
-            padding: '16px',
+            background: '#e5e7eb',
+            padding: deviceMode === 'desktop' ? '0' : '16px',
           }}>
             {isLoading ? (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%' }}>
                 <div style={{ textAlign: 'center', color: '#6b7280' }}>
                   <div style={{ fontSize: '36px', marginBottom: '12px' }}>⏳</div>
                   <p style={{ fontSize: '14px' }}>加载页面数据...</p>
@@ -403,19 +415,19 @@ export function VisualEditorClient({
               <div
                 style={{
                   background: '#fff',
-                  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-                  borderRadius: '8px',
+                  boxShadow: deviceMode === 'desktop' ? 'none' : '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+                  borderRadius: deviceMode === 'desktop' ? '0' : '8px',
                   overflow: 'hidden',
                   transition: 'all 0.3s',
                   width: deviceMode === 'desktop' ? '100%' : `${deviceSize.width}px`,
-                  maxWidth: `${deviceSize.width}px`,
-                  height: deviceMode === 'desktop' ? 'calc(100vh - 60px)' : `${deviceSize.height}px`,
+                  maxWidth: deviceMode === 'desktop' ? '100%' : `${deviceSize.width}px`,
+                  height: deviceMode === 'desktop' ? '100%' : `${deviceSize.height}px`,
                 }}
               >
                 <iframe
                   ref={iframeRef}
                   src={iframeUrl}
-                  style={{ width: '100%', height: '100%', border: 'none' }}
+                  style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
                   title="页面预览"
                   onLoad={() => {
                     if (iframeRef.current?.contentWindow) {
