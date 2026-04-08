@@ -23,8 +23,9 @@ const SELECT_OPTIONS: Record<string, Record<string, { label: string; value: stri
   },
   heroBanner: {
     variant: [
-      { label: '默认', value: 'default' },
-      { label: '暗色', value: 'dark' },
+      { label: '主要', value: 'primary' },
+      { label: '次要', value: 'secondary' },
+      { label: '轮廓', value: 'outline' },
     ],
   },
   businessCards: {
@@ -32,11 +33,47 @@ const SELECT_OPTIONS: Record<string, Record<string, { label: string; value: stri
       { label: '默认', value: 'default' },
       { label: '紧凑', value: 'compact' },
     ],
+    icon: [
+      { label: '齿轮 Cog', value: 'Cog' },
+      { label: '爱心 Heart', value: 'Heart' },
+      { label: '扳手 Wrench', value: 'Wrench' },
+      { label: '灯泡 Lightbulb', value: 'Lightbulb' },
+      { label: '盾牌 Shield', value: 'Shield' },
+      { label: '闪电 Zap', value: 'Zap' },
+    ],
+  },
+  stats: {
+    icon: [
+      { label: '日历 Calendar', value: 'Calendar' },
+      { label: '用户 Users', value: 'Users' },
+      { label: '奖章 Award', value: 'Award' },
+      { label: '趋势 TrendingUp', value: 'TrendingUp' },
+      { label: '工厂 Factory', value: 'Factory' },
+      { label: '全球 Globe', value: 'Globe' },
+    ],
+  },
+  socialChannels: {
+    platform: [
+      { label: '微信', value: 'wechat' },
+      { label: '微博', value: 'weibo' },
+      { label: '抖音', value: 'douyin' },
+      { label: '小红书', value: 'xiaohongshu' },
+      { label: 'B站', value: 'bilibili' },
+      { label: '知乎', value: 'zhihu' },
+      { label: 'LinkedIn', value: 'linkedin' },
+      { label: 'Twitter', value: 'twitter' },
+      { label: 'Facebook', value: 'facebook' },
+    ],
   },
   featureGrid: {
     layout: [
       { label: '网格', value: 'grid' },
       { label: '列表', value: 'list' },
+    ],
+    columns: [
+      { label: '2列', value: '2' },
+      { label: '3列', value: '3' },
+      { label: '4列', value: '4' },
     ],
   },
   banner: {
@@ -53,6 +90,11 @@ const SELECT_OPTIONS: Record<string, Record<string, { label: string; value: stri
       { label: '轮播', value: 'carousel' },
       { label: '瀑布流', value: 'masonry' },
     ],
+    columns: [
+      { label: '2列', value: '2' },
+      { label: '3列', value: '3' },
+      { label: '4列', value: '4' },
+    ],
   },
   richContent: {
     layout: [
@@ -64,11 +106,32 @@ const SELECT_OPTIONS: Record<string, Record<string, { label: string; value: stri
       { label: '亮色', value: 'light' },
       { label: '暗色', value: 'dark' },
     ],
+    backgroundColor: [
+      { label: '无', value: 'none' },
+      { label: '灰色', value: 'gray' },
+      { label: '深色', value: 'dark' },
+    ],
+  },
+  archive: {
+    populateBy: [
+      { label: '按集合', value: 'collection' },
+      { label: '手动选择', value: 'selection' },
+    ],
+    relationTo: [
+      { label: '文章', value: 'posts' },
+    ],
+  },
+  cta: {
+    variant: [
+      { label: '主要', value: 'primary' },
+      { label: '次要', value: 'secondary' },
+      { label: '轮廓', value: 'outline' },
+    ],
   },
 }
 
 // Known select fields
-const SELECT_FIELD_KEYS = ['size', 'variant', 'layout', 'style', 'theme', 'type', 'platform']
+const SELECT_FIELD_KEYS = ['size', 'variant', 'layout', 'style', 'theme', 'type', 'platform', 'icon', 'columns', 'backgroundColor', 'populateBy', 'relationTo']
 
 // Known boolean fields
 const BOOLEAN_FIELD_KEYS = ['enableLink', 'showMoreLink', 'invertBackground', 'enableDescription']
@@ -81,7 +144,7 @@ const LINK_FIELD_KEYS = ['link', 'url', 'linkUrl', 'href']
 
 function detectFieldType(key: string, value: unknown, blockType?: string): FieldType {
   // Image fields
-  if (key === 'backgroundImage' || key === 'image' || key === 'qrCode' || key === 'media' || key === 'coverImage') {
+  if (key === 'backgroundImage' || key === 'image' || key === 'qrCode' || key === 'media' || key === 'coverImage' || key === 'sideImage') {
     return 'image'
   }
   // Boolean fields
@@ -92,8 +155,8 @@ function detectFieldType(key: string, value: unknown, blockType?: string): Field
   if (typeof value === 'number' || NUMBER_FIELD_KEYS.includes(key)) {
     return 'number'
   }
-  // Select fields
-  if (SELECT_FIELD_KEYS.includes(key) && typeof value === 'string') {
+  // Select fields (also handle null/undefined values for select fields)
+  if (SELECT_FIELD_KEYS.includes(key) && (typeof value === 'string' || value === null || value === undefined)) {
     return 'select'
   }
   // Link object fields
@@ -371,21 +434,21 @@ function ArrayFieldEditor({ fieldKey, value, blockId, blockType, onUpdateBlock }
                   {Object.entries(itemObj).map(([itemKey, itemValue]) => {
                     if (itemKey === 'id' || itemKey === 'blockType' || itemKey === 'blockName') return null
                     
+                    // Check if it's a select field first (handles string, null, undefined)
+                    const selectOpts = SELECT_OPTIONS[blockType || '']?.[itemKey]
+                    if (selectOpts) {
+                      return (
+                        <div key={itemKey} style={{ marginTop: '8px' }}>
+                          <label style={{ ...labelStyle, fontSize: '10px' }}>{FIELD_LABELS[itemKey] || itemKey}</label>
+                          <select value={(itemValue as string) ?? ''} onChange={(e) => updateArrayItem(index, itemKey, e.target.value)}
+                            style={{ ...inputStyle, fontSize: '12px', padding: '4px 6px', cursor: 'pointer' }}>
+                            {selectOpts.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                          </select>
+                        </div>
+                      )
+                    }
                     // String fields
                     if (typeof itemValue === 'string') {
-                      // Check if it's a select field
-                      const selectOpts = SELECT_OPTIONS[blockType || '']?.[itemKey]
-                      if (selectOpts) {
-                        return (
-                          <div key={itemKey} style={{ marginTop: '8px' }}>
-                            <label style={{ ...labelStyle, fontSize: '10px' }}>{FIELD_LABELS[itemKey] || itemKey}</label>
-                            <select value={itemValue} onChange={(e) => updateArrayItem(index, itemKey, e.target.value)}
-                              style={{ ...inputStyle, fontSize: '12px', padding: '4px 6px', cursor: 'pointer' }}>
-                              {selectOpts.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                            </select>
-                          </div>
-                        )
-                      }
                       return (
                         <div key={itemKey} style={{ marginTop: '8px' }}>
                           <label style={{ ...labelStyle, fontSize: '10px' }}>{FIELD_LABELS[itemKey] || itemKey}</label>
@@ -551,9 +614,9 @@ export function PropertyPanel({ block, onUpdateBlock }: PropertyPanelProps) {
               return <BooleanFieldEditor key={key} fieldKey={key} value={value as boolean} onChange={(val) => handleFieldChange(key, val)} />
             case 'select': {
               const options = SELECT_OPTIONS[block.blockType]?.[key] || [
-                { label: String(value), value: String(value) },
+                { label: String(value ?? ''), value: String(value ?? '') },
               ]
-              return <SelectFieldEditor key={key} fieldKey={key} value={value as string} options={options} onChange={(val) => handleFieldChange(key, val)} />
+              return <SelectFieldEditor key={key} fieldKey={key} value={(value as string) ?? ''} options={options} onChange={(val) => handleFieldChange(key, val)} />
             }
             case 'image':
               return <ImageFieldEditor key={key} fieldKey={key} value={value} onChange={(val) => handleFieldChange(key, val)} />

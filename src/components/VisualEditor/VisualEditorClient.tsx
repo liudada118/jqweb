@@ -459,39 +459,17 @@ export function VisualEditorClient({
         )}
 
         {/* Main content - three columns */}
-        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
           {/* Left panel - Component Tree */}
-          <div style={{ width: leftPanelWidth, minWidth: leftPanelWidth, flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ flex: 1, overflow: 'hidden' }}>
+          <div style={{ width: leftPanelWidth, minWidth: leftPanelWidth, flexShrink: 0, overflow: 'hidden', height: '100%' }}>
               <ComponentTree
                 blocks={blocks}
                 selectedBlockId={selectedBlockId}
                 onSelectBlock={handleSelectBlock}
                 onMoveBlock={handleMoveBlock}
                 onDeleteBlock={handleDeleteBlock}
+                onAddBlock={() => setShowAddBlock(true)}
               />
-            </div>
-            {/* Add block button */}
-            <div style={{ background: '#fff', borderRight: '1px solid #e5e7eb', padding: '8px 12px' }}>
-              <button
-                onClick={() => setShowAddBlock(true)}
-                style={{
-                  width: '100%',
-                  padding: '6px 0',
-                  fontSize: '12px',
-                  fontWeight: 500,
-                  color: '#2563eb',
-                  border: '1px dashed #93c5fd',
-                  borderRadius: '4px',
-                  background: 'transparent',
-                  cursor: 'pointer',
-                }}
-                onMouseOver={(e) => (e.currentTarget.style.background = '#eff6ff')}
-                onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
-              >
-                + 添加模块
-              </button>
-            </div>
           </div>
 
           {/* Left resize handle */}

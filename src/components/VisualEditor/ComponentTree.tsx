@@ -10,6 +10,7 @@ interface ComponentTreeProps {
   onSelectBlock: (blockId: string) => void
   onMoveBlock: (fromIndex: number, toIndex: number) => void
   onDeleteBlock: (blockId: string) => void
+  onAddBlock?: () => void
 }
 
 export function ComponentTree({
@@ -18,6 +19,7 @@ export function ComponentTree({
   onSelectBlock,
   onMoveBlock,
   onDeleteBlock,
+  onAddBlock,
 }: ComponentTreeProps) {
   const [expandedBlocks, setExpandedBlocks] = useState<Set<string>>(new Set())
   const [dragIndex, setDragIndex] = useState<number | null>(null)
@@ -57,7 +59,7 @@ export function ComponentTree({
     : blocks
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', borderRight: '1px solid #e5e7eb' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, overflow: 'hidden', background: '#fff', borderRight: '1px solid #e5e7eb' }}>
       {/* Header */}
       <div style={{ padding: '8px 12px', borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
         <h3 style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px', margin: 0, marginBlockEnd: '8px' }}>组件结构</h3>
@@ -241,8 +243,29 @@ export function ComponentTree({
         )}
       </div>
 
-      {/* Footer info */}
-      <div style={{ padding: '8px 12px', borderTop: '1px solid #e5e7eb', background: '#f9fafb' }}>
+      {/* Footer with add button */}
+      <div style={{ padding: '8px 12px', borderTop: '1px solid #e5e7eb', background: '#f9fafb', flexShrink: 0 }}>
+        {onAddBlock && (
+          <button
+            onClick={onAddBlock}
+            style={{
+              width: '100%',
+              padding: '6px 0',
+              fontSize: '12px',
+              fontWeight: 500,
+              color: '#2563eb',
+              border: '1px dashed #93c5fd',
+              borderRadius: '4px',
+              background: 'transparent',
+              cursor: 'pointer',
+              marginBottom: '6px',
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.background = '#eff6ff')}
+            onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
+          >
+            + 添加模块
+          </button>
+        )}
         <div style={{ fontSize: '10px', color: '#9ca3af' }}>
           共 {blocks.length} 个模块 · 拖拽排序
         </div>

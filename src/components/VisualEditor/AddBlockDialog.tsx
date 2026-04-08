@@ -13,6 +13,7 @@ const AVAILABLE_BLOCKS = [
   'heroBanner', 'stats', 'businessCards', 'newsHighlight',
   'productShowcase', 'socialChannels', 'contactInfo', 'richContent',
   'timeline', 'imageGallery', 'featureGrid', 'cta', 'content', 'mediaBlock',
+  'archive', 'formBlock',
 ]
 
 export function AddBlockDialog({ isOpen, onClose, onAddBlock }: AddBlockDialogProps) {
