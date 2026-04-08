@@ -49,6 +49,10 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   redirects,
+  experimental: {
+    // Reduce worker count to prevent SQLite lock conflicts during build
+    workerThreads: false,
+  },
   turbopack: {
     root: path.resolve(dirname),
   },
