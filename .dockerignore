@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+*.db
+*.db-journal
+.env
+.env.local
+.env.*.local
+public/media/*
+!public/media/.gitkeep

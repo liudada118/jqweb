@@ -66,6 +66,7 @@ export default buildConfig({
   db: sqliteAdapter({
     client: {
       url: process.env.SQLITE_URL || 'file:./guiqiao-payload.db',
+      ...(process.env.SQLITE_AUTH_TOKEN ? { authToken: process.env.SQLITE_AUTH_TOKEN } : {}),
     },
   }),
   collections: [Pages, Posts, Media, Categories, Users],

@@ -12,7 +12,10 @@ const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
   : process.env.__NEXT_PRIVATE_ORIGIN || `http://localhost:${process.env.PORT || '3001'}`
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['3001-i9yh8tkmg3aza53q010mw-3bccf230.us2.manus.computer', '3001-iovspr8lgnmt9b0zky2vs-e5fd40ae.sg1.manus.computer'],
+  allowedDevOrigins: [
+    '3001-i9yh8tkmg3aza53q010mw-3bccf230.us2.manus.computer',
+    '3001-iovspr8lgnmt9b0zky2vs-e5fd40ae.sg1.manus.computer',
+  ],
   images: {
     qualities: [100],
     localPatterns: [

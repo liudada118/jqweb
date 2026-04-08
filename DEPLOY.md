@@ -55,50 +55,160 @@ PORT=3001 pnpm dev
 
 ## 生产部署
 
-### 构建
+### 方案一：Vercel 部署（推荐）
+
+Vercel 是 Next.js 官方推荐的部署平台，配合 Turso 云数据库可实现零运维。
+
+**第一步：创建 Turso 数据库**
 
 ```bash
+# 安装 Turso CLI
+curl -sSfL https://get.tur.so/install.sh | bash
+
+# 登录并创建数据库
+turso auth login
+turso db create guiqiao-website --location hkg
+
+# 获取连接信息
+turso db show guiqiao-website --url
+# 输出：libsql://guiqiao-website-yourname.turso.io
+
+turso db tokens create guiqiao-website
+# 输出：token 字符串
+```
+
+**第二步：部署到 Vercel**
+
+1. 将代码推送到 GitHub 仓库
+2. 访问 [vercel.com](https://vercel.com)，导入仓库
+3. 配置环境变量（见下表），点击 Deploy
+
+**第三步：初始化**
+
+部署完成后访问 `/admin` 创建管理员账号，登录后自动进入可视化编辑器。
+
+### 方案二：Docker 部署
+
+项目根目录已包含 `Dockerfile`，支持多阶段构建。
+
+**使用 Docker Compose（推荐）：**
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  web:
+    build:
+      context: .
+      args:
+        PAYLOAD_SECRET: your-strong-secret-key
+    ports:
+      - "3000:3000"
+    environment:
+      - PAYLOAD_SECRET=your-strong-secret-key
+      - SQLITE_URL=file:/app/data/guiqiao-payload.db
+      - NODE_ENV=production
+    volumes:
+      - sqlite-data:/app/data
+      - media-data:/app/public/media
+    restart: unless-stopped
+
+volumes:
+  sqlite-data:
+  media-data:
+```
+
+```bash
+docker compose up -d
+```
+
+**使用 Turso 云数据库：**
+
+```bash
+docker build \
+  --build-arg PAYLOAD_SECRET=your-secret \
+  --build-arg SQLITE_URL=libsql://your-db.turso.io \
+  --build-arg SQLITE_AUTH_TOKEN=your-token \
+  -t guiqiao-website .
+
+docker run -d -p 3000:3000 \
+  -e PAYLOAD_SECRET=your-secret \
+  -e SQLITE_URL=libsql://your-db.turso.io \
+  -e SQLITE_AUTH_TOKEN=your-token \
+  guiqiao-website
+```
+
+### 方案三：直接部署到服务器
+
+```bash
+# 安装依赖并构建
+pnpm install
+cp .env.example .env  # 编辑 .env 填入实际值
 pnpm build
-pnpm start
+
+# 使用 PM2 守护进程
+npm install -g pm2
+pm2 start pnpm --name guiqiao-website -- start
+pm2 startup && pm2 save
 ```
 
-### Docker 部署（推荐）
-
-```dockerfile
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
-COPY . .
-RUN pnpm build
-
-FROM node:18-alpine AS runner
-WORKDIR /app
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/guiqiao-payload.db ./guiqiao-payload.db
-
-ENV NODE_ENV=production
-ENV PORT=3001
-
-EXPOSE 3001
-CMD ["pnpm", "start"]
-```
+配合 Nginx 反向代理使用，参考 `DEPLOY.md` 中的 Nginx 配置示例。
 
 ### 环境变量
 
-| 变量 | 必填 | 说明 |
-|------|------|------|
-| PAYLOAD_SECRET | 是 | CMS加密密钥，生产环境请使用强随机字符串 |
-| DATABASE_URI | 否 | 数据库连接，默认 `file:./guiqiao-payload.db` |
-| NEXT_PUBLIC_SERVER_URL | 否 | 公开访问URL，如 `https://www.guiqiao.com` |
-| PORT | 否 | 服务端口，默认 3001 |
+| 变量 | 必填 | 默认值 | 说明 |
+|------|------|--------|------|
+| `PAYLOAD_SECRET` | 是 | 无 | CMS 加密密钥，生产环境必须使用强随机密码 |
+| `SQLITE_URL` | 否 | `file:./guiqiao-payload.db` | 数据库连接 URL（支持 Turso） |
+| `SQLITE_AUTH_TOKEN` | 否 | 无 | Turso 数据库认证 Token |
+| `NEXT_PUBLIC_SERVER_URL` | 否 | 自动检测 | 网站公开 URL |
+| `PORT` | 否 | `3000` | 服务端口 |
+| `CRON_SECRET` | 否 | 无 | 定时任务认证密钥 |
 
 ### 数据库
 
-项目默认使用 SQLite，数据库文件为 `guiqiao-payload.db`。如需使用 PostgreSQL 或其他数据库，请参考 [Payload CMS 数据库文档](https://payloadcms.com/docs/database/overview)。
+项目默认使用 SQLite，数据库文件为 `guiqiao-payload.db`。生产环境推荐使用 [Turso](https://turso.tech)（SQLite 云端托管，免费额度充足）。如需使用 PostgreSQL，请参考 [Payload CMS 数据库文档](https://payloadcms.com/docs/database/overview)。
+
+### Nginx 反向代理配置
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name your-domain.com;
+
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+
+    location /media/ {
+        alias /path/to/guiqiao-website/public/media/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location /_next/static/ {
+        proxy_pass http://127.0.0.1:3000;
+        expires 365d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
 
 ## 项目结构
 
