@@ -1,0 +1,54 @@
+
+> guiqiao-payload@1.0.0 dev E:\jqweb
+> cross-env NODE_OPTIONS=--no-deprecation next dev
+
+▲ Next.js 16.2.1 (Turbopack)
+- Local:         http://localhost:3001
+- Network:       http://192.168.204.1:3001
+- Environments: .env
+✓ Ready in 700ms
+
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+[11:37:03] [33mWARN[39m: [36mNo email adapter provided. Email will be written to console. More info at https://payloadcms.com/docs/email/overview.[39m
+ GET / 200 in 5.2s (next.js: 252ms, application-code: 5.0s)
+ GET / 200 in 91ms (next.js: 5ms, application-code: 86ms)
+ GET / 200 in 82ms (next.js: 7ms, application-code: 75ms)
+ GET / 200 in 58ms (next.js: 3ms, application-code: 55ms)
+ GET / 200 in 67ms (next.js: 3ms, application-code: 65ms)
+ GET /api/users/me 200 in 2.9s (next.js: 2.9s, application-code: 18ms)
+ GET /api/users/me 200 in 16ms (next.js: 11ms, application-code: 6ms)
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+[14:17:08] [33mWARN[39m: [36mNo email adapter provided. Email will be written to console. More info at https://payloadcms.com/docs/email/overview.[39m
+ GET /brand-story 200 in 2.8s (next.js: 2.8s, application-code: 92ms)
+ GET /products 200 in 699ms (next.js: 605ms, application-code: 94ms)
+ GET /care 200 in 46ms (next.js: 11ms, application-code: 35ms)
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+[14:17:11] [33mWARN[39m: [36mNo email adapter provided. Email will be written to console. More info at https://payloadcms.com/docs/email/overview.[39m
+ GET /brand-story 200 in 41ms (next.js: 10ms, application-code: 31ms)
+ GET /care 200 in 40ms (next.js: 12ms, application-code: 28ms)
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+[14:17:13] [33mWARN[39m: [36mNo email adapter provided. Email will be written to console. More info at https://payloadcms.com/docs/email/overview.[39m
+ GET /precision 200 in 41ms (next.js: 12ms, application-code: 29ms)
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+[14:17:16] [33mWARN[39m: [36mNo email adapter provided. Email will be written to console. More info at https://payloadcms.com/docs/email/overview.[39m
+○ Compiling /admin/[[...segments]] ...
+ GET /admin 200 in 6.5s (next.js: 5.4s, application-code: 1106ms)
+ GET /api/users/me 200 in 12ms (next.js: 8ms, application-code: 4ms)
+ GET /api/payload-preferences/nav 200 in 69ms (next.js: 64ms, application-code: 5ms)
+ GET /api/payload-preferences/nav 200 in 21ms (next.js: 17ms, application-code: 5ms)
+ GET /admin/login 200 in 146ms (next.js: 9ms, application-code: 137ms)
+ GET /admin/login 200 in 68ms (next.js: 3ms, application-code: 65ms)
+ GET /admin/create-first-user 200 in 170ms (next.js: 3ms, application-code: 167ms)
+ GET /admin/create-first-user 200 in 71ms (next.js: 3ms, application-code: 69ms)
+ GET /precision 404 in 102ms (next.js: 14ms, application-code: 88ms)
+[⣷] Pulling schema from database...
+[2K[1G[✓] Pulling schema from database...
+[14:17:38] [33mWARN[39m: [36mNo email adapter provided. Email will be written to console. More info at https://payloadcms.com/docs/email/overview.[39m
+ GET / 200 in 168ms (next.js: 7ms, application-code: 161ms)
+ GET /api/users/me 200 in 26ms (next.js: 18ms, application-code: 8ms)
+ ELIFECYCLE  Command failed with exit code 3221225786.
